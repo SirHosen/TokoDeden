@@ -21,9 +21,6 @@
                     <x-nav-link :href="route('about')" :active="request()->routeIs('about')">
                         {{ __('Tentang Kami') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('contact')" :active="request()->routeIs('contact')">
-                        {{ __('Kontak') }}
-                    </x-nav-link>
                 </div>
             </div>
 
@@ -113,9 +110,6 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('about')" :active="request()->routeIs('about')">
                 {{ __('Tentang Kami') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('contact')" :active="request()->routeIs('contact')">
-                {{ __('Kontak') }}
             </x-responsive-nav-link>
         </div>
 

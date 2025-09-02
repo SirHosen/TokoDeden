@@ -31,16 +31,29 @@
                         <ul class="space-y-3">
                             <li>
                                 <a href="{{ route('shop.products.index') }}"
-                                   class="flex items-center group {{ !request('category') ? 'font-semibold text-green-700' : 'text-gray-700' }}">
-                                    <span class="w-2 h-2 rounded-full {{ !request('category') ? 'bg-green-700' : 'bg-gray-300 group-hover:bg-green-700' }} mr-3 transition-all duration-300"></span>
+                                   class="flex items-center group {{ !request('category') ? 'font-semibold text-green-700' : 'text-gray-700' }} py-1">
+                                    <div class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+                                        <i class="fas fa-layer-group text-sm {{ !request('category') ? 'text-green-700' : 'text-gray-500' }}"></i>
+                                    </div>
                                     Semua Kategori
                                 </a>
                             </li>
                             @foreach($categories as $category)
                                 <li>
                                     <a href="{{ route('shop.products.index', ['category' => $category->slug]) }}"
-                                       class="flex items-center group {{ request('category') == $category->slug ? 'font-semibold text-green-700' : 'text-gray-700' }}">
-                                        <span class="w-2 h-2 rounded-full {{ request('category') == $category->slug ? 'bg-green-700' : 'bg-gray-300 group-hover:bg-green-700' }} mr-3 transition-all duration-300"></span>
+                                       class="flex items-center group {{ request('category') == $category->slug ? 'font-semibold text-green-700' : 'text-gray-700' }} py-1.5">
+                                        <div class="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 mr-3 border border-gray-100">
+                                            @if($category->image)
+                                                <img src="{{ asset('storage/' . $category->image) }}"
+                                                     class="w-full h-full object-cover"
+                                                     alt="{{ $category->name }}">
+                                            @else
+                                                <div class="w-full h-full bg-gray-100 flex items-center justify-center
+                                                     {{ request('category') == $category->slug ? 'text-green-700' : 'text-gray-500' }}">
+                                                    {{ strtoupper(substr($category->name, 0, 1)) }}
+                                                </div>
+                                            @endif
+                                        </div>
                                         {{ $category->name }}
                                     </a>
                                 </li>
@@ -182,9 +195,9 @@
                             </div>
                             <div class="md:w-3/4 md:pl-6">
                                 <h3 class="text-xl font-bold text-gray-900 mb-2">Butuh bantuan untuk menemukan produk yang tepat?</h3>
-                                <p class="text-gray-600 mb-4">Tim kami siap membantu Anda menemukan pakan terbaik sesuai kebutuhan ternak Anda. Konsultasikan kebutuhan Anda dengan kami.</p>
-                                <a href="{{ route('contact') }}" class="inline-flex items-center px-5 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-all">
-                                    <i class="fas fa-phone-alt mr-2"></i> Hubungi Kami
+                                <p class="text-gray-600 mb-4">Tim kami siap membantu Anda menemukan pakan terbaik sesuai kebutuhan ternak Anda.</p>
+                                <a href="{{ route('about') }}" class="inline-flex items-center px-5 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-all">
+                                    <i class="fas fa-info-circle mr-2"></i> Tentang Kami
                                 </a>
                             </div>
                         </div>

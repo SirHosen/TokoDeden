@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
@@ -24,12 +25,20 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:categories|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Category::create([
+        $data = [
             'name' => $request->name,
             'slug' => Str::slug($request->name),
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('categories', 'public');
+            $data['image'] = $imagePath;
+        }
+
+        Category::create($data);
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Kategori berhasil ditambahkan!');
@@ -44,12 +53,28 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|max:255|unique:categories,name,' . $category->id,
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $category->update([
+        $data = [
             'name' => $request->name,
             'slug' => Str::slug($request->name),
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($category->image) {
+                Storage::disk('public')->delete($category->image);
+            }
+
+            $imagePath = $request->file('image')->store('categories', 'public');
+            $data['image'] = $imagePath;
+        } elseif ($request->remove_image == 1 && $category->image) {
+            Storage::disk('public')->delete($category->image);
+            $data['image'] = null;
+        }
+
+        $category->update($data);
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Kategori berhasil diperbarui!');

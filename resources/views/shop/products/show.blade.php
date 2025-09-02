@@ -1,11 +1,11 @@
 <x-app-layout>
     <!-- Product Detail Hero -->
-    <div class="bg-gradient-to-r from-green-700 to-green-800 py-8">
+    <div class="bg-gradient-to-r from-green-700 to-green-800 py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav class="flex mb-3" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
-                        <a href="/" class="text-green-100 hover:text-white">
+                        <a href="/" class="text-green-100 hover:text-white transition">
                             <i class="fas fa-home mr-1"></i> Home
                         </a>
                     </li>
@@ -14,7 +14,7 @@
                             <svg class="w-3 h-3 text-green-200 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
                             </svg>
-                            <a href="{{ route('shop.products.index') }}" class="ml-1 text-green-100 hover:text-white">Produk</a>
+                            <a href="{{ route('shop.products.index') }}" class="ml-1 text-green-100 hover:text-white transition">Produk</a>
                         </div>
                     </li>
                     <li>
@@ -22,7 +22,14 @@
                             <svg class="w-3 h-3 text-green-200 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
                             </svg>
-                            <a href="{{ route('shop.products.index', ['category' => $product->category->slug]) }}" class="ml-1 text-green-100 hover:text-white">{{ $product->category->name }}</a>
+                            <a href="{{ route('shop.products.index', ['category' => $product->category->slug]) }}" class="ml-1 text-green-100 hover:text-white transition">
+                                <div class="flex items-center">
+                                    @if($product->category->image)
+                                        <img src="{{ asset('storage/' . $product->category->image) }}" class="w-4 h-4 rounded-full mr-1 bg-white" alt="{{ $product->category->name }}">
+                                    @endif
+                                    {{ $product->category->name }}
+                                </div>
+                            </a>
                         </div>
                     </li>
                     <li aria-current="page">
@@ -35,80 +42,108 @@
                     </li>
                 </ol>
             </nav>
+            <h1 class="text-3xl md:text-4xl font-bold text-white mt-4">{{ $product->name }}</h1>
         </div>
     </div>
 
     <div class="py-12 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-8">
                     <!-- Product Image -->
-                    <div class="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
-                        @if($product->image)
-                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-[500px] object-contain p-8">
-                        @else
-                            <div class="w-full h-[500px] flex items-center justify-center bg-gradient-to-r from-green-50 to-green-100 p-8">
-                                <div class="text-center">
-                                    <i class="fas fa-seedling text-7xl mb-5 text-green-600"></i>
-                                    <p class="text-lg font-medium text-green-800">{{ $product->category->name }}</p>
+                    <div class="md:rounded-l-xl overflow-hidden md:border-r border-gray-100 bg-white md:bg-gray-50">
+                        <div class="relative">
+                            @if($product->image)
+                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-[500px] object-contain p-4 md:p-8">
+                                <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-50/80 to-transparent pointer-events-none"></div>
+                            @else
+                                <div class="w-full h-[500px] flex items-center justify-center bg-gradient-to-r from-green-50 to-green-100 p-8">
+                                    <div class="text-center">
+                                        <i class="fas fa-seedling text-7xl mb-5 text-green-600"></i>
+                                        <p class="text-lg font-medium text-green-800">{{ $product->category->name }}</p>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <div class="absolute top-4 left-4">
+                                <div class="flex items-center">
+                                    @if($product->category->image)
+                                        <div class="h-8 w-8 rounded-full overflow-hidden mr-2 border-2 border-white shadow-md">
+                                            <img src="{{ asset('storage/' . $product->category->image) }}"
+                                                 class="w-full h-full object-cover"
+                                                 alt="{{ $product->category->name }}">
+                                        </div>
+                                    @endif
+                                    <span class="bg-green-600/80 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full font-medium shadow-md">
+                                        {{ $product->category->name }}
+                                    </span>
                                 </div>
                             </div>
-                        @endif
+                        </div>
                     </div>
 
                     <!-- Product Details -->
-                    <div class="flex flex-col py-4">
-                        <div class="mb-8">
+                    <div class="flex flex-col p-6 md:p-8">
+                        <div class="mb-6">
                             <div class="flex items-center mb-4">
-                                <span class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full uppercase font-semibold tracking-wide">{{ $product->category->name }}</span>
-                                @if($product->stock > 0)
-                                    <span class="ml-3 bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full uppercase font-semibold tracking-wide">Tersedia</span>
-                                @else
-                                    <span class="ml-3 bg-red-100 text-red-800 text-xs px-3 py-1 rounded-full uppercase font-semibold tracking-wide">Stok Habis</span>
-                                @endif
+                                <div class="flex items-center">
+                                    @if($product->stock > 0)
+                                        <span class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs px-3 py-1.5 rounded-full uppercase font-semibold tracking-wide shadow-sm flex items-center">
+                                            <i class="fas fa-check-circle mr-1"></i> Tersedia
+                                        </span>
+                                    @else
+                                        <span class="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs px-3 py-1.5 rounded-full uppercase font-semibold tracking-wide shadow-sm flex items-center">
+                                            <i class="fas fa-times-circle mr-1"></i> Stok Habis
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
 
-                            <h1 class="text-3xl font-bold text-gray-900 mb-3">{{ $product->name }}</h1>
-                            <p class="text-2xl font-bold text-yellow-500 mb-2">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                            <p class="text-3xl font-bold text-yellow-500 mb-4">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
 
-                            <div class="flex items-center mt-3 text-gray-500">
-                                <i class="fas fa-box-open mr-2"></i>
-                                <span>Stok: {{ $product->stock }} unit</span>
+                            <div class="flex items-center justify-between mt-4 bg-gray-50 p-3 rounded-lg">
+                                <div class="flex items-center text-gray-700">
+                                    <i class="fas fa-box-open text-green-600 mr-2"></i>
+                                    <span>Stok: <span class="font-medium">{{ $product->stock }} unit</span></span>
+                                </div>
+                                <div class="flex items-center text-gray-700">
+                                    <i class="fas fa-truck text-green-600 mr-2"></i>
+                                    <span>Siap Kirim</span>
+                                </div>
                             </div>
                         </div>
 
                         <div class="border-t border-gray-100 my-6 pt-6">
-                            <h3 class="text-xl font-bold text-gray-900 mb-4">Deskripsi Produk</h3>
-                            <div class="text-gray-700 space-y-4 mb-6">
-                                <p class="leading-relaxed">{{ $product->description }}</p>
-                            </div>
-
-                            <div class="bg-green-50 border-l-4 border-green-600 p-4 rounded-r-lg mt-6">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-leaf text-green-600"></i>
-                                    </div>
-                                    <div class="ml-3">
-                                        <h3 class="text-sm font-medium text-green-800">Kualitas Terjamin</h3>
-                                        <div class="mt-2 text-sm text-green-700">
-                                            <p>Produk ini telah melalui pemeriksaan kualitas dan terjamin keamanannya.</p>
-                                        </div>
-                                    </div>
+                            <div class="flex items-center mb-4">
+                                <h3 class="text-xl font-bold text-gray-900">Deskripsi Produk</h3>
+                                <div class="ml-auto">
+                                    <button class="text-green-600 hover:text-green-800 flex items-center text-sm" onclick="toggleDescription()">
+                                        <span id="toggleText">Selengkapnya</span>
+                                        <i class="fas fa-chevron-down ml-1" id="toggleIcon"></i>
+                                    </button>
                                 </div>
+                            </div>
+                            <div class="text-gray-700 space-y-4 mb-6 description-container overflow-hidden transition-all duration-300" id="productDescription" style="max-height: 80px;">
+                                <p class="leading-relaxed">{{ $product->description }}</p>
                             </div>
                         </div>
 
                         @if($product->stock > 0)
                             <div class="mt-auto">
-                                <form action="{{ route('cart.add') }}" method="POST" class="space-y-4">
+                                <form action="{{ route('cart.add') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                    <div>
-                                        <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">Jumlah</label>
-                                        <div class="flex">
+
+                                    <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <label for="quantity" class="text-base font-medium text-gray-700">Jumlah</label>
+                                            <span class="text-sm text-gray-500">Tersedia: {{ $product->stock }} unit</span>
+                                        </div>
+
+                                        <div class="flex items-center space-x-4">
                                             <div class="relative flex items-center max-w-[8rem]">
-                                                <button type="button" id="decrement-button"
-                                                    class="bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-l-lg p-3 h-11 focus:ring-gray-100 focus:outline-none"
+                                                <button type="button"
+                                                    class="bg-green-600 hover:bg-green-700 text-white border-0 rounded-l-lg p-3 h-12 focus:outline-none transition-all"
                                                     onclick="decrementQuantity()">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
@@ -119,18 +154,19 @@
                                                     min="1"
                                                     max="{{ $product->stock }}"
                                                     value="1"
-                                                    class="bg-gray-50 border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-0 block w-full py-2.5"
+                                                    class="bg-white border border-gray-300 h-12 text-center text-gray-900 text-base focus:ring-0 block w-full py-2.5"
                                                     required
                                                 >
-                                                <button type="button" id="increment-button"
-                                                    class="bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-r-lg p-3 h-11 focus:ring-gray-100 focus:outline-none"
+                                                <button type="button"
+                                                    class="bg-green-600 hover:bg-green-700 text-white border-0 rounded-r-lg p-3 h-12 focus:outline-none transition-all"
                                                     onclick="incrementQuantity({{ $product->stock }})">
                                                     <i class="fas fa-plus"></i>
                                                 </button>
                                             </div>
+
                                             <button
                                                 type="submit"
-                                                class="bg-green-600 hover:bg-green-700 text-white font-medium px-8 py-2 ml-4 rounded-lg transition-all duration-300 flex-grow shadow-sm hover:shadow flex items-center justify-center"
+                                                class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium px-8 py-3 rounded-lg transition-all duration-300 flex-grow shadow-md hover:shadow-lg flex items-center justify-center"
                                             >
                                                 <i class="fas fa-shopping-cart mr-2"></i> Tambah ke Keranjang
                                             </button>
@@ -140,15 +176,22 @@
                             </div>
                         @else
                             <div class="mt-auto">
-                                <div class="bg-red-50 border-l-4 border-red-600 p-4 rounded-r-lg">
+                                <div class="bg-red-50 rounded-xl border border-red-200 p-6 shadow-sm">
                                     <div class="flex">
                                         <div class="flex-shrink-0">
-                                            <i class="fas fa-exclamation-circle text-red-600"></i>
+                                            <div class="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+                                                <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+                                            </div>
                                         </div>
-                                        <div class="ml-3">
-                                            <h3 class="text-sm font-medium text-red-800">Stok Habis</h3>
-                                            <div class="mt-2 text-sm text-red-700">
+                                        <div class="ml-4">
+                                            <h3 class="text-lg font-medium text-red-800">Stok Habis</h3>
+                                            <div class="mt-2 text-base text-red-700">
                                                 <p>Mohon maaf, stok produk ini sedang habis. Silahkan kembali lagi nanti.</p>
+                                            </div>
+                                            <div class="mt-4">
+                                                <a href="{{ route('shop.products.index') }}" class="inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-lg text-white bg-red-600 hover:bg-red-700">
+                                                    <i class="fas fa-arrow-left mr-2"></i> Lihat Produk Lainnya
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -171,6 +214,24 @@
                     const input = document.getElementById('quantity');
                     if(parseInt(input.value) < max) {
                         input.value = parseInt(input.value) + 1;
+                    }
+                }
+
+                function toggleDescription() {
+                    const description = document.getElementById('productDescription');
+                    const toggleText = document.getElementById('toggleText');
+                    const toggleIcon = document.getElementById('toggleIcon');
+
+                    if (description.style.maxHeight === '80px') {
+                        description.style.maxHeight = '1000px';
+                        toggleText.innerText = 'Sembunyikan';
+                        toggleIcon.classList.remove('fa-chevron-down');
+                        toggleIcon.classList.add('fa-chevron-up');
+                    } else {
+                        description.style.maxHeight = '80px';
+                        toggleText.innerText = 'Selengkapnya';
+                        toggleIcon.classList.remove('fa-chevron-up');
+                        toggleIcon.classList.add('fa-chevron-down');
                     }
                 }
             </script>
@@ -219,34 +280,7 @@
                 </div>
             @endif
 
-            <!-- Product Benefits -->
-            <div class="mt-16 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="grid grid-cols-1 md:grid-cols-3">
-                    <div class="p-8 text-center border-b md:border-b-0 md:border-r border-gray-100">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-4">
-                            <i class="fas fa-truck text-2xl"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">Pengiriman Cepat</h3>
-                        <p class="text-gray-600">Produk dikirim langsung dari gudang kami ke lokasi Anda</p>
-                    </div>
-
-                    <div class="p-8 text-center border-b md:border-b-0 md:border-r border-gray-100">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-4">
-                            <i class="fas fa-certificate text-2xl"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">Kualitas Terjamin</h3>
-                        <p class="text-gray-600">Semua produk kami melewati quality control yang ketat</p>
-                    </div>
-
-                    <div class="p-8 text-center">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-4">
-                            <i class="fas fa-headset text-2xl"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">Layanan Pelanggan</h3>
-                        <p class="text-gray-600">Tim kami siap membantu Anda dengan segala pertanyaan</p>
-                    </div>
-                </div>
-            </div>
+            <!-- End of Related Products -->
         </div>
     </div>
 </x-app-layout>

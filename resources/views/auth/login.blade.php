@@ -20,7 +20,7 @@
 <body class="font-sans antialiased">
     <div class="min-h-screen flex">
         <!-- Left Side - Image -->
-        <div class="hidden lg:flex lg:w-1/2 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1533311966340-c4a002d72c1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
+        <div class="hidden lg:flex lg:w-1/2 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1707658295769-b6f4f38f5b64?q=80&w=780&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
             <div class="w-full h-full bg-green-700 bg-opacity-40 flex items-center justify-center">
                 <div class="text-center text-white p-12">
                     <h1 class="text-4xl font-bold mb-4">Toko Deden</h1>

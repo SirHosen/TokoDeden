@@ -4,8 +4,7 @@
 
 @section('content')
 <div class="mb-6">
-    <h2 class="text-xl font-semibold text-gray-800">Daftar Pesanan</h2>
-    <p class="text-gray-600 text-sm">Kelola semua pesanan dari pelanggan</p>
+    <h2 class="text-2xl font-bold text-gray-800">Kelola semua pesanan dari pelanggan</h2>
 </div>
 
 <div class="bg-white shadow-sm rounded-lg overflow-hidden mb-6">

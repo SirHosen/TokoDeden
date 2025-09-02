@@ -3,47 +3,62 @@
 @section('header', 'Manajemen Produk')
 
 @section('content')
-<div class="flex justify-between items-center mb-6">
+<div class="flex justify-between items-start mb-6">
     <div>
-        <h2 class="text-xl font-semibold text-gray-800">Daftar Produk</h2>
-        <p class="text-gray-600 text-sm">Kelola semua produk pakan ternak Anda</p>
+        <h2 class="text-2xl font-bold text-gray-800">Kelola semua produk pakan ternak Anda</h2>
     </div>
-    <a href="{{ route('admin.products.create') }}" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg">
-        <i class="fas fa-plus mr-2"></i> Tambah Produk
+    <a href="{{ route('admin.products.create') }}" class="flex items-center bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium py-2.5 px-5 rounded-lg transition-all shadow-md hover:shadow-lg">
+        <i class="fas fa-plus-circle mr-2"></i> Tambah Produk
     </a>
 </div>
 
-<div class="bg-white shadow-sm rounded-lg overflow-hidden">
-    <div class="p-4">
-        <div class="flex items-center justify-between mb-4">
-            <form action="{{ route('admin.products.index') }}" method="GET" class="flex">
-                <input type="text" name="search" placeholder="Cari produk..." class="border border-gray-300 rounded-l-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent" value="{{ request('search') }}">
-                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-r-lg">
-                    <i class="fas fa-search"></i>
+<div class="bg-white shadow-lg rounded-xl overflow-hidden">
+    <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
+        <h3 class="text-white font-semibold text-lg">Daftar Produk</h3>
+    </div>
+    <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+            <form action="{{ route('admin.products.index') }}" method="GET" class="flex w-full md:w-96">
+                <div class="relative flex-grow">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" name="search" placeholder="Cari nama produk..."
+                           class="block w-full border border-gray-300 rounded-l-lg py-2.5 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent shadow-sm"
+                           value="{{ request('search') }}">
+                </div>
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-r-lg shadow-sm">
+                    Cari
                 </button>
             </form>
+
+            <div class="hidden md:flex items-center space-x-2 text-gray-500 text-sm">
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
+                    <i class="fas fa-cubes mr-1"></i> {{ $products->total() }} Produk
+                </span>
+            </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto bg-white rounded-lg border border-gray-200">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Produk
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Kategori
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Harga
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Stok
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
                         </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="px-6 py-3.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
                         </th>
                     </tr>
@@ -107,8 +122,54 @@
             </table>
         </div>
 
-        <div class="px-6 py-4">
+        <div class="mt-6">
             {{ $products->links() }}
+        </div>
+    </div>
+</div>
+
+<!-- Product Stats Card -->
+<div class="bg-white shadow-lg rounded-xl overflow-hidden mt-8">
+    <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
+        <h3 class="text-white font-semibold text-lg">Statistik Produk</h3>
+    </div>
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 p-6 rounded-xl shadow-sm">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-box text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Total Produk</p>
+                        <h4 class="text-2xl font-bold text-gray-800">{{ $products->total() }}</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 p-6 rounded-xl shadow-sm">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Produk Aktif</p>
+                        <h4 class="text-2xl font-bold text-gray-800">{{ $products->where('is_active', true)->count() }}</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 p-6 rounded-xl shadow-sm">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Stok Menipis (<10)</p>
+                        <h4 class="text-2xl font-bold text-gray-800">{{ $products->where('stock', '<', 10)->count() }}</h4>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

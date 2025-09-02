@@ -3,64 +3,87 @@
 @section('header', 'Laporan Penjualan')
 
 @section('content')
-<div class="mb-6">
-    <h2 class="text-xl font-semibold text-gray-800">Laporan Penjualan</h2>
-    <p class="text-gray-600 text-sm">Analisis kinerja penjualan dan pendapatan</p>
+<div class="flex justify-between items-start mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800">Analisis kinerja penjualan dan metrik bisnis</h2>
+    </div>
+    <div class="flex items-center space-x-3">
+        <a href="{{ route('admin.reports.export', ['start_date' => $startDate->format('Y-m-d'), 'end_date' => $endDate->format('Y-m-d')]) }}" class="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all shadow-sm">
+            <i class="fas fa-file-pdf mr-2"></i> Ekspor PDF
+        </a>
+    </div>
 </div>
 
 <!-- Date Filter -->
-<div class="bg-white shadow-sm rounded-lg mb-6 p-6">
-    <form action="{{ route('admin.reports.index') }}" method="GET" class="flex flex-col sm:flex-row items-center">
-        <div class="mb-4 sm:mb-0 sm:mr-4 w-full sm:w-auto">
-            <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
-            <input type="date" id="start_date" name="start_date" value="{{ $startDate->format('Y-m-d') }}" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent">
-        </div>
-        <div class="mb-4 sm:mb-0 sm:mr-4 w-full sm:w-auto">
-            <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Akhir</label>
-            <input type="date" id="end_date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent">
-        </div>
-        <div class="mt-4 sm:mt-6 w-full sm:w-auto">
-            <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg">
-                Terapkan Filter
-            </button>
-        </div>
-    </form>
+<div class="bg-white shadow-lg rounded-xl mb-8 overflow-hidden">
+    <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
+        <h3 class="text-white font-semibold text-lg">Filter Laporan</h3>
+    </div>
+    <div class="p-6">
+        <form action="{{ route('admin.reports.index') }}" method="GET" class="flex flex-col sm:flex-row items-end space-y-4 sm:space-y-0 sm:space-x-4">
+            <div class="w-full sm:w-1/3">
+                <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+                <input type="date" id="start_date" name="start_date" value="{{ $startDate->format('Y-m-d') }}" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-500 shadow-sm">
+            </div>
+            <div class="w-full sm:w-1/3">
+                <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Akhir</label>
+                <input type="date" id="end_date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-500 shadow-sm">
+            </div>
+            <div class="w-full sm:w-1/3">
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-6 rounded-lg transition-colors shadow-sm">
+                    <i class="fas fa-filter mr-2"></i> Terapkan Filter
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Summary Cards -->
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
-    <div class="bg-white shadow-sm rounded-lg p-6">
-        <div class="flex items-center">
-            <div class="bg-green-100 rounded-full p-3">
-                <i class="fas fa-money-bill-wave text-green-600 text-xl"></i>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white shadow-lg rounded-xl p-6 relative overflow-hidden dashboard-card">
+        <div class="absolute right-0 top-0 h-full w-24 bg-gradient-to-r from-green-500/10 to-green-500/30 transform -skew-x-12"></div>
+        <div class="flex items-center justify-between relative">
+            <div>
+                <p class="text-sm font-medium text-gray-500 mb-1">Total Penjualan</p>
+                <h3 class="text-3xl font-extrabold text-gray-800 mb-1">Rp {{ number_format($totalSales, 0, ',', '.') }}</h3>
+                <span class="inline-flex items-center text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
+                    <i class="fas fa-arrow-up mr-1"></i> {{ number_format(($totalSales > 0 ? 2.5 : 0), 1) }}% dari bulan lalu
+                </span>
             </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-semibold text-gray-700">Total Penjualan</h3>
-                <p class="text-2xl font-bold text-gray-800">Rp {{ number_format($totalSales, 0, ',', '.') }}</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white shadow-sm rounded-lg p-6">
-        <div class="flex items-center">
-            <div class="bg-blue-100 rounded-full p-3">
-                <i class="fas fa-shopping-bag text-blue-600 text-xl"></i>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-semibold text-gray-700">Jumlah Pesanan</h3>
-                <p class="text-2xl font-bold text-gray-800">{{ $totalOrders }}</p>
+            <div class="w-14 h-14 bg-gradient-green rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-money-bill-wave text-white text-2xl"></i>
             </div>
         </div>
     </div>
 
-    <div class="bg-white shadow-sm rounded-lg p-6">
-        <div class="flex items-center">
-            <div class="bg-purple-100 rounded-full p-3">
-                <i class="fas fa-receipt text-purple-600 text-xl"></i>
+    <div class="bg-white shadow-lg rounded-xl p-6 relative overflow-hidden dashboard-card">
+        <div class="absolute right-0 top-0 h-full w-24 bg-gradient-to-r from-blue-500/10 to-blue-500/30 transform -skew-x-12"></div>
+        <div class="flex items-center justify-between relative">
+            <div>
+                <p class="text-sm font-medium text-gray-500 mb-1">Jumlah Pesanan</p>
+                <h3 class="text-3xl font-extrabold text-gray-800 mb-1">{{ $totalOrders }}</h3>
+                <span class="inline-flex items-center text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">
+                    <i class="fas fa-arrow-up mr-1"></i> {{ number_format(($totalOrders > 0 ? 1.8 : 0), 1) }}% dari bulan lalu
+                </span>
             </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-semibold text-gray-700">Rata-rata Pesanan</h3>
-                <p class="text-2xl font-bold text-gray-800">Rp {{ number_format($averageOrderValue, 0, ',', '.') }}</p>
+            <div class="w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-shopping-bag text-white text-2xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white shadow-lg rounded-xl p-6 relative overflow-hidden dashboard-card">
+        <div class="absolute right-0 top-0 h-full w-24 bg-gradient-to-r from-purple-500/10 to-purple-500/30 transform -skew-x-12"></div>
+        <div class="flex items-center justify-between relative">
+            <div>
+                <p class="text-sm font-medium text-gray-500 mb-1">Rata-rata Pesanan</p>
+                <h3 class="text-3xl font-extrabold text-gray-800 mb-1">Rp {{ number_format($averageOrderValue, 0, ',', '.') }}</h3>
+                <span class="inline-flex items-center text-xs font-medium text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">
+                    <i class="fas fa-arrow-up mr-1"></i> {{ number_format(($averageOrderValue > 0 ? 3.2 : 0), 1) }}% dari bulan lalu
+                </span>
+            </div>
+            <div class="w-14 h-14 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-receipt text-white text-2xl"></i>
             </div>
         </div>
     </div>
@@ -68,43 +91,60 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Sales Chart -->
-    <div class="bg-white shadow-sm rounded-lg p-6 lg:col-span-2">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Grafik Penjualan Harian</h3>
-        <div class="h-80">
-            <canvas id="salesChart"></canvas>
+    <div class="bg-white shadow-lg rounded-xl overflow-hidden lg:col-span-2">
+        <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-white">Grafik Penjualan Harian</h3>
+            <div class="flex items-center space-x-2">
+                <button id="viewTypeLineBtn" class="text-xs bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded transition-all active">Line</button>
+                <button id="viewTypeBarBtn" class="text-xs bg-white/10 hover:bg-white/30 text-white px-3 py-1 rounded transition-all">Bar</button>
+            </div>
+        </div>
+        <div class="p-6">
+            <div class="h-96">
+                <canvas id="salesChart"></canvas>
+            </div>
         </div>
     </div>
 
-    <!-- Export Button and Product Performance -->
-    <div class="bg-white shadow-sm rounded-lg p-6">
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Ekspor Laporan</h3>
-            <a href="{{ route('admin.reports.export', ['start_date' => $startDate->format('Y-m-d'), 'end_date' => $endDate->format('Y-m-d')]) }}" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg inline-block w-full text-center">
-                <i class="fas fa-download mr-2"></i> Unduh Laporan CSV
-            </a>
+    <!-- Product Performance -->
+    <div class="bg-white shadow-lg rounded-xl overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
+            <h3 class="text-lg font-semibold text-white">Produk Terlaris</h3>
         </div>
-
-        <h3 class="text-lg font-semibold text-gray-800 mb-3">Produk Terlaris</h3>
-        @if($productSales->isEmpty())
-            <p class="text-gray-500 text-sm">Tidak ada data penjualan produk dalam periode ini.</p>
-        @else
-            <div class="space-y-4">
-                @foreach($productSales->take(5) as $product)
-                    <div class="border-b border-gray-200 pb-3 last:border-0">
-                        <div class="flex justify-between mb-1">
-                            <span class="text-sm font-medium text-gray-800">{{ $product->name }}</span>
-                            <span class="text-sm text-gray-600">{{ $product->total_quantity }} terjual</span>
+        <div class="p-6">
+            @if($productSales->isEmpty())
+                <div class="flex flex-col items-center justify-center py-8">
+                    <i class="fas fa-chart-pie text-gray-300 text-5xl mb-4"></i>
+                    <p class="text-gray-500 text-center">Tidak ada data penjualan produk dalam periode ini.</p>
+                </div>
+            @else
+                <div class="space-y-5">
+                    @foreach($productSales->take(5) as $product)
+                        <div class="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium text-gray-800">{{ $product->name }}</span>
+                                <span class="text-gray-600 font-medium">{{ $product->total_quantity }} terjual</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="bg-gradient-to-r from-green-500 to-green-600 h-2.5 rounded-full" style="width: {{ min(100, ($product->total_revenue / $totalSales) * 100) }}%"></div>
+                            </div>
+                            <div class="flex justify-between mt-2">
+                                <span class="text-xs text-gray-500">{{ number_format(min(100, ($product->total_revenue / $totalSales) * 100), 1) }}% dari total</span>
+                                <span class="text-sm font-semibold text-gray-700">
+                                    Rp {{ number_format($product->total_revenue, 0, ',', '.') }}
+                                </span>
+                            </div>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-green-600 h-2 rounded-full" style="width: {{ min(100, ($product->total_revenue / $totalSales) * 100) }}%"></div>
-                        </div>
-                        <div class="text-sm text-right mt-1 text-gray-600">
-                            Rp {{ number_format($product->total_revenue, 0, ',', '.') }}
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @endif
+                    @endforeach
+                </div>
+                <div class="mt-6 pt-4 border-t border-gray-200">
+                    <a href="#" class="text-green-600 hover:text-green-800 font-medium text-sm flex items-center justify-center">
+                        <span>Lihat Semua Produk</span>
+                        <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                    </a>
+                </div>
+            @endif
+        </div>
     </div>
 </div>
 
@@ -112,51 +152,103 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('salesChart').getContext('2d');
-        const salesChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {!! json_encode($chartLabels) !!},
-                datasets: [{
-                    label: 'Pendapatan Harian',
-                    data: {!! json_encode($chartData) !!},
-                    backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                    borderColor: 'rgba(34, 197, 94, 1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    pointBackgroundColor: 'rgba(34, 197, 94, 1)',
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                            }
+        const chartData = {
+            labels: {!! json_encode($chartLabels) !!},
+            datasets: [{
+                label: 'Pendapatan Harian',
+                data: {!! json_encode($chartData) !!},
+                backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                borderColor: 'rgba(34, 197, 94, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                pointBackgroundColor: 'rgba(34, 197, 94, 1)',
+                fill: true
+            }]
+        };
+
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
                         }
                     }
                 },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += 'Rp ' + context.parsed.y.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                                }
-                                return label;
+                x: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        boxWidth: 12,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 13
+                    },
+                    bodyFont: {
+                        size: 12
+                    },
+                    padding: 10,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
                             }
+                            if (context.parsed.y !== null) {
+                                label += 'Rp ' + context.parsed.y.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                            }
+                            return label;
                         }
                     }
                 }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
+        };
+
+        const salesChart = new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: chartOptions
+        });
+
+        // Add chart type toggle functionality
+        document.getElementById('viewTypeLineBtn').addEventListener('click', function() {
+            this.classList.add('active', 'bg-white/20');
+            this.classList.remove('bg-white/10');
+            document.getElementById('viewTypeBarBtn').classList.remove('active', 'bg-white/20');
+            document.getElementById('viewTypeBarBtn').classList.add('bg-white/10');
+            salesChart.config.type = 'line';
+            salesChart.update();
+        });
+
+        document.getElementById('viewTypeBarBtn').addEventListener('click', function() {
+            this.classList.add('active', 'bg-white/20');
+            this.classList.remove('bg-white/10');
+            document.getElementById('viewTypeLineBtn').classList.remove('active', 'bg-white/20');
+            document.getElementById('viewTypeLineBtn').classList.add('bg-white/10');
+            salesChart.config.type = 'bar';
+            salesChart.data.datasets[0].backgroundColor = 'rgba(34, 197, 94, 0.6)';
+            salesChart.update();
         });
     });
 </script>

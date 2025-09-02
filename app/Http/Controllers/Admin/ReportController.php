@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDF;
 
 class ReportController extends Controller
 {
@@ -104,9 +105,9 @@ class ReportController extends Controller
     }
 
     /**
-     * Export reports as CSV.
+     * Export reports as PDF.
      *
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return \Illuminate\Http\Response
      */
     public function export(Request $request)
     {
@@ -119,52 +120,60 @@ class ReportController extends Controller
             ? \Carbon\Carbon::parse($request->input('start_date'))->startOfDay()
             : $endDate->copy()->subDays(30)->startOfDay();
 
-        // Set CSV headers
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="orders-report-' . date('Y-m-d') . '.csv"',
-        ];
-
         // Get filtered orders
         $orders = Order::with(['user', 'orderItems.product'])
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $callback = function() use ($orders, $startDate, $endDate) {
-            $file = fopen('php://output', 'w');
+        // Get product sales data
+        $productSales = Product::select(
+            'products.id',
+            'products.name',
+            DB::raw('SUM(order_items.quantity) as total_quantity'),
+            DB::raw('SUM(order_items.price * order_items.quantity) as total_revenue')
+        )
+        ->join('order_items', 'products.id', '=', 'order_items.product_id')
+        ->join('orders', 'order_items.order_id', '=', 'orders.id')
+        ->where('orders.status', 'completed')
+        ->whereBetween('orders.created_at', [$startDate, $endDate])
+        ->groupBy('products.id', 'products.name')
+        ->orderBy('total_revenue', 'desc')
+        ->take(10)
+        ->get();
 
-            // Add report title and date range
-            fputcsv($file, ['Laporan Penjualan TokoDeden']);
-            fputcsv($file, ['Periode: ' . $startDate->format('d M Y') . ' - ' . $endDate->format('d M Y')]);
-            fputcsv($file, []);
+        // Prepare summary data
+        $totalOrders = $orders->count();
+        $totalSales = $orders->sum('total_price');
+        $averageOrderValue = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
 
-            // Add headers
-            fputcsv($file, ['ID Pesanan', 'Pelanggan', 'Email', 'Tanggal', 'Status', 'Jumlah Item', 'Total (Rp)']);
+        // Get daily sales data for chart
+        $dailySales = Order::select(
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('SUM(total_price) as total')
+        )
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->where('status', 'completed')
+        ->groupBy('date')
+        ->orderBy('date')
+        ->get();
 
-            // Add data rows
-            foreach ($orders as $order) {
-                $itemCount = $order->orderItems->count();
+        // Generate PDF with view
+        $pdf = \PDF::loadView('admin.reports.pdf', [
+            'orders' => $orders,
+            'productSales' => $productSales,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'totalOrders' => $totalOrders,
+            'totalSales' => $totalSales,
+            'averageOrderValue' => $averageOrderValue,
+            'dailySales' => $dailySales
+        ]);
 
-                fputcsv($file, [
-                    $order->id,
-                    $order->user->name ?? 'N/A',
-                    $order->user->email ?? 'N/A',
-                    $order->created_at->format('Y-m-d H:i:s'),
-                    ucfirst($order->status),
-                    $itemCount,
-                    number_format($order->total_price, 0, ',', '.')
-                ]);
-            }
+        // Set paper to landscape for better readability
+        $pdf->setPaper('a4', 'landscape');
 
-            // Add summary
-            fputcsv($file, []);
-            fputcsv($file, ['Total Pesanan', $orders->count()]);
-            fputcsv($file, ['Total Pendapatan', number_format($orders->sum('total_price'), 0, ',', '.')]);
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        // Stream the PDF with a download filename
+        return $pdf->download('laporan-penjualan-' . date('Y-m-d') . '.pdf');
     }
 }
