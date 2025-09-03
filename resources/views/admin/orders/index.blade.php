@@ -18,16 +18,19 @@
                 Menunggu Konfirmasi
             </a>
             <a href="{{ route('admin.orders.index', ['status' => 'processing']) }}" class="px-3 py-1 mb-2 mr-2 text-sm rounded-full {{ request('status') == 'processing' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 hover:bg-gray-200' }}">
-                Diproses
+                Sedang Diproses
             </a>
             <a href="{{ route('admin.orders.index', ['status' => 'shipped']) }}" class="px-3 py-1 mb-2 mr-2 text-sm rounded-full {{ request('status') == 'shipped' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 hover:bg-gray-200' }}">
-                Dikirim
+                Dalam Pengiriman
             </a>
             <a href="{{ route('admin.orders.index', ['status' => 'delivered']) }}" class="px-3 py-1 mb-2 mr-2 text-sm rounded-full {{ request('status') == 'delivered' ? 'bg-green-100 text-green-800' : 'bg-gray-100 hover:bg-gray-200' }}">
-                Selesai
+                Diterima
             </a>
             <a href="{{ route('admin.orders.index', ['status' => 'cancelled']) }}" class="px-3 py-1 mb-2 mr-2 text-sm rounded-full {{ request('status') == 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-gray-100 hover:bg-gray-200' }}">
                 Dibatalkan
+            </a>
+            <a href="{{ route('admin.orders.index', ['status' => 'rejected']) }}" class="px-3 py-1 mb-2 mr-2 text-sm rounded-full {{ request('status') == 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 hover:bg-gray-200' }}">
+                Ditolak
             </a>
         </div>
     </div>
@@ -75,16 +78,8 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                @if($order->status == 'pending') bg-yellow-100 text-yellow-800
-                                @elseif($order->status == 'processing') bg-blue-100 text-blue-800
-                                @elseif($order->status == 'shipped') bg-indigo-100 text-indigo-800
-                                @elseif($order->status == 'delivered') bg-green-100 text-green-800
-                                @else bg-red-100 text-red-800 @endif">
-                                @if($order->status == 'pending') Menunggu Konfirmasi
-                                @elseif($order->status == 'processing') Diproses
-                                @elseif($order->status == 'shipped') Dikirim
-                                @elseif($order->status == 'delivered') Selesai
-                                @else Dibatalkan @endif
+                                bg-{{ $order->status_color }}-100 text-{{ $order->status_color }}-800">
+                                {{ $order->status_name }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -41,7 +41,7 @@ class ReportController extends Controller
 
         // Get orders data for reports
         $orders = Order::whereBetween('created_at', [$startDate, $endDate])
-            ->where('status', 'completed')
+            ->where('status', Order::STATUS_DELIVERED)
             ->get();
 
         $totalOrders = $orders->count();
@@ -54,7 +54,7 @@ class ReportController extends Controller
             DB::raw('SUM(total_price) as total')
         )
         ->whereBetween('created_at', [$startDate, $endDate])
-        ->where('status', 'completed')
+        ->where('status', Order::STATUS_DELIVERED)
         ->groupBy('date')
         ->orderBy('date')
         ->get()
@@ -86,7 +86,7 @@ class ReportController extends Controller
         )
         ->join('order_items', 'products.id', '=', 'order_items.product_id')
         ->join('orders', 'order_items.order_id', '=', 'orders.id')
-        ->where('orders.status', 'completed')
+        ->where('orders.status', Order::STATUS_DELIVERED)
         ->whereBetween('orders.created_at', [$startDate, $endDate])
         ->groupBy('products.id', 'products.name')
         ->orderBy('total_revenue', 'desc')
@@ -123,6 +123,7 @@ class ReportController extends Controller
         // Get filtered orders
         $orders = Order::with(['user', 'orderItems.product'])
             ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('status', Order::STATUS_DELIVERED)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -135,7 +136,7 @@ class ReportController extends Controller
         )
         ->join('order_items', 'products.id', '=', 'order_items.product_id')
         ->join('orders', 'order_items.order_id', '=', 'orders.id')
-        ->where('orders.status', 'completed')
+        ->where('orders.status', Order::STATUS_DELIVERED)
         ->whereBetween('orders.created_at', [$startDate, $endDate])
         ->groupBy('products.id', 'products.name')
         ->orderBy('total_revenue', 'desc')
@@ -153,7 +154,7 @@ class ReportController extends Controller
             DB::raw('SUM(total_price) as total')
         )
         ->whereBetween('created_at', [$startDate, $endDate])
-        ->where('status', 'completed')
+        ->where('status', Order::STATUS_DELIVERED)
         ->groupBy('date')
         ->orderBy('date')
         ->get();

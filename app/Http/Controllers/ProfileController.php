@@ -20,13 +20,28 @@ class ProfileController extends Controller
 
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $validated = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Handle profile photo upload
+        if ($request->hasFile('avatar')) {
+            // Delete previous photo if exists
+            if ($user->avatar && file_exists(public_path('storage/' . $user->avatar))) {
+                unlink(public_path('storage/' . $user->avatar));
+            }
+
+            // Store new photo
+            $photoPath = $request->file('avatar')->store('avatars', 'public');
+            $validated['avatar'] = $photoPath;
         }
 
-        $request->user()->save();
+        $user->fill($validated);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
@@ -54,6 +69,11 @@ class ProfileController extends Controller
         $request->validate([
             'address' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
+            'city' => 'nullable|string|max:100',
+            'province' => 'nullable|string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'address_name' => 'nullable|string|max:50',
+            'is_default_address' => 'nullable|boolean',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);
@@ -62,6 +82,11 @@ class ProfileController extends Controller
         $user->update([
             'address' => $request->address,
             'phone' => $request->phone,
+            'city' => $request->city,
+            'province' => $request->province,
+            'postal_code' => $request->postal_code,
+            'address_name' => $request->address_name ?? ($request->is_default_address ? 'Alamat Utama' : null),
+            'is_default_address' => $request->boolean('is_default_address'),
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);

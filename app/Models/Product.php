@@ -28,4 +28,14 @@ class Product extends Model
     {
         return $this->hasMany(Cart::class);
     }
+
+    /**
+     * Determine if the product is actually active (considers both is_active flag and stock)
+     *
+     * @return bool
+     */
+    public function getIsActuallyActiveAttribute()
+    {
+        return $this->is_active && $this->stock > 0;
+    }
 }

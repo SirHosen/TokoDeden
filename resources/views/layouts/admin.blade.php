@@ -91,6 +91,12 @@
                                 <span class="ml-3">Kategori</span>
                             </a>
                         </li>
+                        <li class="sidebar-menu-item">
+                            <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'bg-gray-700 text-white border-l-4 border-green-500' : 'text-gray-300 hover:bg-gray-800/60' }} flex items-center px-4 py-3 text-base font-medium rounded-lg transition-all">
+                                <i class="fas fa-users text-lg sidebar-icon {{ request()->routeIs('admin.users.*') ? 'text-green-400' : 'text-gray-400' }} w-6 transition-transform"></i>
+                                <span class="ml-3">Pengguna</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
@@ -113,7 +119,12 @@
                             <a href="{{ route('admin.reports.index') }}" class="{{ request()->routeIs('admin.reports.*') ? 'bg-gray-700 text-white border-l-4 border-green-500' : 'text-gray-300 hover:bg-gray-800/60' }} flex items-center px-4 py-3 text-base font-medium rounded-lg transition-all">
                                 <i class="fas fa-chart-bar text-lg sidebar-icon {{ request()->routeIs('admin.reports.*') ? 'text-green-400' : 'text-gray-400' }} w-6 transition-transform"></i>
                                 <span class="ml-3">Laporan</span>
-                                <span class="bg-green-500 ml-auto text-xs rounded-full px-2 py-1 font-semibold">Pro</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-menu-item">
+                            <a href="{{ route('admin.products.sales') }}" class="{{ request()->routeIs('admin.products.sales') ? 'bg-gray-700 text-white border-l-4 border-green-500' : 'text-gray-300 hover:bg-gray-800/60' }} flex items-center px-4 py-3 text-base font-medium rounded-lg transition-all">
+                                <i class="fas fa-chart-line text-lg sidebar-icon {{ request()->routeIs('admin.products.sales') ? 'text-green-400' : 'text-gray-400' }} w-6 transition-transform"></i>
+                                <span class="ml-3">Penjualan Produk</span>
                             </a>
                         </li>
                     </ul>
@@ -149,17 +160,33 @@
                 <div class="flex items-center space-x-4">
                     <div class="relative" x-data="{ isOpen: false }">
                         <button @click="isOpen = !isOpen" class="flex items-center space-x-3 focus:outline-none">
-                            <div class="w-10 h-10 rounded-full bg-gradient-green flex items-center justify-center text-white font-semibold">
-                                {{ substr(Auth::user()->name, 0, 1) }}
+                            <div class="w-10 h-10 rounded-full bg-gradient-green flex items-center justify-center text-white font-semibold overflow-hidden">
+                                @if(Auth::user()->avatar)
+                                    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover">
+                                @else
+                                    {{ substr(Auth::user()->name, 0, 1) }}
+                                @endif
                             </div>
                             <div class="hidden md:block text-left">
                                 <p class="text-sm font-medium text-gray-800">{{ Auth::user()->name }}</p>
-                                <p class="text-xs text-gray-500">Administrator</p>
+                                <p class="text-xs text-gray-500">{{ Auth::user()->role->name }}</p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </button>
+                        <!-- Dropdown menu -->
+                        <div x-show="isOpen" @click.away="isOpen = false" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50">
+                            <a href="{{ route('admin.profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user-edit mr-2 text-green-600"></i> Edit Profil
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2 text-gray-600"></i> Log Out
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

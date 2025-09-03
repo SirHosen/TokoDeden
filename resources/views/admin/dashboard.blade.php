@@ -39,7 +39,7 @@
                     <i class="fas fa-shopping-bag text-purple-600 text-xl"></i>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-700">Pesanan</h3>
+                    <h3 class="text-lg font-semibold text-gray-700">Pesanan Selesai</h3>
                     <p class="text-2xl font-bold text-gray-800">{{ $totalOrders }}</p>
                 </div>
             </div>

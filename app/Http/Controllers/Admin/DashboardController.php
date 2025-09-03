@@ -17,11 +17,11 @@ class DashboardController extends Controller
         // Stats for admin dashboard
         $totalCustomers = User::where('role_id', 2)->count();
         $totalProducts = Product::count();
-        $totalOrders = Order::count();
-        $totalRevenue = Order::where('status', 'delivered')->sum('total_price');
+        $totalOrders = Order::where('status', Order::STATUS_DELIVERED)->count();
+        $totalRevenue = Order::where('status', Order::STATUS_DELIVERED)->sum('total_price');
 
         // Get monthly revenue data for chart
-        $monthlyRevenue = Order::where('status', 'delivered')
+        $monthlyRevenue = Order::where('status', Order::STATUS_DELIVERED)
             ->whereYear('created_at', Carbon::now()->year)
             ->select(
                 DB::raw('MONTH(created_at) as month'),

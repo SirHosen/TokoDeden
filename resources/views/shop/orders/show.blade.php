@@ -31,19 +31,77 @@
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-semibold text-gray-800">Pesanan #{{ $order->order_number }}</h3>
                         <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full
-                            @if($order->status == 'pending') bg-yellow-100 text-yellow-800
-                            @elseif($order->status == 'processing') bg-blue-100 text-blue-800
-                            @elseif($order->status == 'shipped') bg-indigo-100 text-indigo-800
-                            @elseif($order->status == 'delivered') bg-green-100 text-green-800
-                            @else bg-red-100 text-red-800 @endif">
-                            @if($order->status == 'pending') Menunggu Konfirmasi
-                            @elseif($order->status == 'processing') Diproses
-                            @elseif($order->status == 'shipped') Dikirim
-                            @elseif($order->status == 'delivered') Selesai
-                            @else Dibatalkan @endif
+                            bg-{{ $order->status_color }}-100 text-{{ $order->status_color }}-800">
+                            {{ $order->status_name }}
                         </span>
                     </div>
                     <p class="text-sm text-gray-600 mt-1">Tanggal Pesanan: {{ $order->created_at->format('d M Y, H:i') }}</p>
+
+                    <!-- Order Progress -->
+                    <div class="mt-6 mb-4">
+                        <div class="relative">
+                            <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
+                                @php
+                                    $progressWidth = match($order->status) {
+                                        'pending' => '20%',
+                                        'processing' => '40%',
+                                        'shipped' => '60%',
+                                        'delivered' => '100%',
+                                        'cancelled' => '100%',
+                                        'rejected' => '100%',
+                                        default => '0%',
+                                    };
+
+                                    $progressColor = match($order->status) {
+                                        'pending' => 'bg-yellow-500',
+                                        'processing' => 'bg-blue-500',
+                                        'shipped' => 'bg-indigo-500',
+                                        'delivered' => 'bg-green-500',
+                                        'cancelled' => 'bg-red-500',
+                                        'rejected' => 'bg-red-500',
+                                        default => 'bg-gray-500',
+                                    };
+                                @endphp
+                                <div style="width: {{ $progressWidth }}" class="{{ $progressColor }} rounded transition-all duration-500"></div>
+                            </div>
+                            <div class="flex justify-between text-xs mt-2">
+                                <div class="{{ $order->status == 'pending' ? 'font-bold text-yellow-600' : '' }}">Konfirmasi</div>
+                                <div class="{{ $order->status == 'processing' ? 'font-bold text-blue-600' : '' }}">Diproses</div>
+                                <div class="{{ $order->status == 'shipped' ? 'font-bold text-indigo-600' : '' }}">Dikirim</div>
+                                <div class="{{ $order->status == 'delivered' ? 'font-bold text-green-600' : ($order->status == 'cancelled' || $order->status == 'rejected' ? 'font-bold text-red-600' : '') }}">
+                                    {{ ($order->status == 'cancelled') ? 'Dibatalkan' : (($order->status == 'rejected') ? 'Ditolak' : 'Selesai') }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Actions -->
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        @if($order->canBeCancelled())
+                            <form action="{{ route('orders.cancel', $order) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?');">
+                                @csrf
+                                <button type="submit" class="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition">
+                                    Batalkan Pesanan
+                                </button>
+                            </form>
+                        @endif
+
+                        @if($order->canBeMarkedAsReceived())
+                            <form action="{{ route('orders.receive', $order) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition">
+                                    Pesanan Diterima
+                                </button>
+                            </form>
+                        @endif
+
+                        @if($order->status == 'rejected')
+                            <div class="mt-2 text-sm text-red-600">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                Pesanan Anda ditolak oleh penjual.
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
                 <!-- Order Items -->

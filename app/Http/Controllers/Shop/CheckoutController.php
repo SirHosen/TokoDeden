@@ -72,13 +72,30 @@ class CheckoutController extends Controller
 
     public function process(Request $request)
     {
-        $request->validate([
-            'address' => 'required|string',
+        $user = Auth::user();
+        $useDefaultAddress = $request->has('use_default_address');
+
+        $validationRules = [
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'payment_method' => 'required|in:transfer,cod',
             'notes' => 'nullable|string',
-        ]);
+        ];
+
+        if (!$useDefaultAddress) {
+            $validationRules['address'] = 'required|string';
+            $validationRules['city'] = 'nullable|string';
+            $validationRules['province'] = 'nullable|string';
+            $validationRules['postal_code'] = 'nullable|string';
+        } else {
+            // If using default address, make sure it exists
+            if (!$user->address || !$user->is_default_address) {
+                return redirect()->route('cart.index')
+                    ->with('error', 'Alamat default tidak ditemukan. Silakan atur alamat default di profil Anda.');
+            }
+        }
+
+        $request->validate($validationRules);
 
         $cartItems = Cart::with('product')->where('user_id', Auth::id())->get();
 
@@ -117,20 +134,35 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
-            // Create order
-            $order = Order::create([
+            // Prepare order data
+            $orderData = [
                 'user_id' => Auth::id(),
                 'order_number' => 'ORD-' . strtoupper(Str::random(10)),
                 'total_price' => $totalPrice,
                 'shipping_cost' => $shippingCost,
                 'distance' => $distance,
-                'address' => $request->address,
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
                 'payment_method' => $request->payment_method,
                 'status' => 'pending',
                 'notes' => $request->notes,
-            ]);
+            ];
+
+            // Add address information based on whether using default address or not
+            if ($request->has('use_default_address') && $user->is_default_address) {
+                $orderData['address'] = $user->address;
+                $orderData['city'] = $user->city;
+                $orderData['province'] = $user->province;
+                $orderData['postal_code'] = $user->postal_code;
+            } else {
+                $orderData['address'] = $request->address;
+                $orderData['city'] = $request->city;
+                $orderData['province'] = $request->province;
+                $orderData['postal_code'] = $request->postal_code;
+            }
+
+            // Create order
+            $order = Order::create($orderData);
 
             // Create order items
             foreach ($cartItems as $item) {

@@ -118,15 +118,31 @@
                     <p class="text-gray-500 text-center">Tidak ada data penjualan produk dalam periode ini.</p>
                 </div>
             @else
-                <div class="space-y-5">
-                    @foreach($productSales->take(5) as $product)
-                        <div class="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
-                            <div class="flex justify-between mb-2">
-                                <span class="font-medium text-gray-800">{{ $product->name }}</span>
-                                <span class="text-gray-600 font-medium">{{ $product->total_quantity }} terjual</span>
+                <!-- Top 3 Products with Special Design -->
+                <div class="space-y-5 mb-6">
+                    <h4 class="font-semibold text-gray-700 mb-4">Top 3 Produk Terlaris</h4>
+                    @foreach($productSales->take(3) as $index => $product)
+                        <div class="border-b border-gray-200 pb-5 last:border-0 last:pb-0">
+                            <div class="flex justify-between mb-2 items-center">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center
+                                        {{ $index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                                           ($index === 1 ? 'bg-gray-100 text-gray-700' :
+                                           'bg-amber-50 text-amber-800') }} mr-3 font-bold">
+                                        #{{ $index + 1 }}
+                                    </div>
+                                    <span class="font-medium text-gray-800">{{ $product->name }}</span>
+                                </div>
+                                <span class="text-gray-600 font-medium py-1 px-2.5 bg-gray-100 rounded-full text-sm">
+                                    {{ $product->total_quantity }} terjual
+                                </span>
                             </div>
                             <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div class="bg-gradient-to-r from-green-500 to-green-600 h-2.5 rounded-full" style="width: {{ min(100, ($product->total_revenue / $totalSales) * 100) }}%"></div>
+                                <div class="bg-gradient-to-r
+                                    {{ $index === 0 ? 'from-yellow-500 to-yellow-400' :
+                                       ($index === 1 ? 'from-gray-500 to-gray-400' :
+                                       'from-amber-600 to-amber-500') }}
+                                    h-2.5 rounded-full" style="width: {{ min(100, ($product->total_revenue / $totalSales) * 100) }}%"></div>
                             </div>
                             <div class="flex justify-between mt-2">
                                 <span class="text-xs text-gray-500">{{ number_format(min(100, ($product->total_revenue / $totalSales) * 100), 1) }}% dari total</span>
@@ -137,10 +153,11 @@
                         </div>
                     @endforeach
                 </div>
-                <div class="mt-6 pt-4 border-t border-gray-200">
-                    <a href="#" class="text-green-600 hover:text-green-800 font-medium text-sm flex items-center justify-center">
-                        <span>Lihat Semua Produk</span>
-                        <i class="fas fa-arrow-right ml-2 text-xs"></i>
+
+                <!-- Link to Product Sales Page -->
+                <div class="mt-6 pt-4 border-t border-gray-200 text-center">
+                    <a href="{{ route('admin.products.sales') }}" class="bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-800 transition-colors font-medium text-sm inline-flex items-center px-4 py-2 rounded-lg border border-green-200">
+                        <i class="fas fa-chart-bar mr-2"></i> Lihat Semua Produk Terjual
                     </a>
                 </div>
             @endif
@@ -151,6 +168,7 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Sales chart initialization
         const ctx = document.getElementById('salesChart').getContext('2d');
         const chartData = {
             labels: {!! json_encode($chartLabels) !!},

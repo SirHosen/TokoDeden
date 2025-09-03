@@ -11,10 +11,35 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')->latest()->paginate(10);
-        return view('admin.products.index', compact('products'));
+        $query = Product::with('category');
+
+        // Filter by category if provided
+        if ($request->has('category') && $request->category) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Filter by search term if provided
+        if ($request->has('search') && $request->search) {
+            $searchTerm = $request->search;
+            $query->where('name', 'like', "%{$searchTerm}%");
+        }
+
+        $products = $query->latest()->paginate(10);
+
+        // Get categories for filter dropdown
+        $categories = Category::all();
+
+        // Get statistics
+        $stats = [
+            'total' => Product::count(),
+            'active' => Product::where('is_active', true)->where('stock', '>', 0)->count(),
+            'lowStock' => Product::where('stock', '>', 0)->where('stock', '<', 10)->count(),
+            'outOfStock' => Product::where('stock', 0)->count()
+        ];
+
+        return view('admin.products.index', compact('products', 'categories', 'stats'));
     }
 
     public function create()

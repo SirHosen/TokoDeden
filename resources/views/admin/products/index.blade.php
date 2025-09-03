@@ -17,7 +17,7 @@
         <h3 class="text-white font-semibold text-lg">Daftar Produk</h3>
     </div>
     <div class="p-6">
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
             <form action="{{ route('admin.products.index') }}" method="GET" class="flex w-full md:w-96">
                 <div class="relative flex-grow">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -32,8 +32,17 @@
                 </button>
             </form>
 
-            <div class="hidden md:flex items-center space-x-2 text-gray-500 text-sm">
-                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
+            <div class="flex items-center gap-2">
+                <select name="category" onchange="window.location.href='{{ route('admin.products.index') }}?category='+this.value" class="border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent shadow-sm text-gray-700 text-sm">
+                    <option value="">Semua Kategori</option>
+                    @foreach($categories ?? [] as $category)
+                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap">
                     <i class="fas fa-cubes mr-1"></i> {{ $products->total() }} Produk
                 </span>
             </div>
@@ -94,9 +103,19 @@
                                 <div class="text-sm text-gray-900">{{ $product->stock }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ $product->is_active ? 'Aktif' : 'Tidak Aktif' }}
-                                </span>
+                                @if($product->stock == 0)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Stok Habis
+                                    </span>
+                                @elseif(!$product->is_active)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        Tidak Aktif
+                                    </span>
+                                @else
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Aktif
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <a href="{{ route('admin.products.edit', $product) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
@@ -134,7 +153,7 @@
         <h3 class="text-white font-semibold text-lg">Statistik Produk</h3>
     </div>
     <div class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div class="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 p-6 rounded-xl shadow-sm">
                 <div class="flex items-center">
                     <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
@@ -142,7 +161,7 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Total Produk</p>
-                        <h4 class="text-2xl font-bold text-gray-800">{{ $products->total() }}</h4>
+                        <h4 class="text-2xl font-bold text-gray-800">{{ $stats['total'] }}</h4>
                     </div>
                 </div>
             </div>
@@ -154,7 +173,7 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Produk Aktif</p>
-                        <h4 class="text-2xl font-bold text-gray-800">{{ $products->where('is_active', true)->count() }}</h4>
+                        <h4 class="text-2xl font-bold text-gray-800">{{ $stats['active'] }}</h4>
                     </div>
                 </div>
             </div>
@@ -165,8 +184,20 @@
                         <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 mb-1">Stok Menipis (<10)</p>
-                        <h4 class="text-2xl font-bold text-gray-800">{{ $products->where('stock', '<', 10)->count() }}</h4>
+                        <p class="text-sm text-gray-500 mb-1">Stok Menipis (1-10)</p>
+                        <h4 class="text-2xl font-bold text-gray-800">{{ $stats['lowStock'] }}</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 p-6 rounded-xl shadow-sm">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                        <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Produk Habis (Stok 0)</p>
+                        <h4 class="text-2xl font-bold text-gray-800">{{ $stats['outOfStock'] }}</h4>
                     </div>
                 </div>
             </div>

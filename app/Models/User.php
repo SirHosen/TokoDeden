@@ -18,8 +18,15 @@ class User extends Authenticatable
         'role_id',
         'address',
         'phone',
+        'city',
+        'province',
+        'postal_code',
+        'address_name',
+        'is_default_address',
         'latitude',
-        'longitude'
+        'longitude',
+        'avatar',
+        'is_active'
     ];
 
     protected $hidden = [
@@ -30,6 +37,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_active' => 'boolean',
+        'is_default_address' => 'boolean',
     ];
 
     public function role()

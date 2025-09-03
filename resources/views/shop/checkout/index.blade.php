@@ -26,17 +26,60 @@
                                 <input type="text" name="phone" id="phone" value="{{ $user->phone }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent" readonly>
                             </div>
 
-                            <div class="mb-4">
-                                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Alamat Pengiriman <span class="text-red-500">*</span></label>
-                                <textarea name="address" id="address" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent" required>{{ $user->address }}</textarea>
+                            <!-- Option to use default address -->
+                            <div class="mb-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="flex items-center mb-3">
+                                    <input type="checkbox" id="use_default_address" name="use_default_address" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded" {{ $user->is_default_address ? 'checked' : '' }}>
+                                    <label for="use_default_address" class="ml-2 block text-sm font-medium text-gray-700">
+                                        Gunakan alamat default
+                                    </label>
+                                </div>
+
+                                @if($user->address && $user->is_default_address)
+                                <div class="flex items-start bg-white p-3 rounded-md border border-gray-200">
+                                    <div class="flex-shrink-0 text-green-500">
+                                        <i class="fas fa-map-marker-alt fa-lg"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900">{{ $user->address_name ?: 'Alamat Utama' }}</p>
+                                        <p class="text-sm text-gray-600">{{ $user->address }}</p>
+                                        <p class="text-xs text-gray-500">{{ $user->city }}, {{ $user->province }} {{ $user->postal_code }}</p>
+                                    </div>
+                                </div>
+                                @else
+                                <p class="text-sm text-gray-500">Anda belum menyimpan alamat default. Silakan tambahkan alamat di profil Anda.</p>
+                                @endif
+                            </div>
+
+                            <div id="manual-address-section" class="{{ $user->is_default_address ? 'hidden' : '' }}">
+                                <div class="mb-4">
+                                    <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Alamat Pengiriman <span class="text-red-500">*</span></label>
+                                    <textarea name="address" id="address" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent" required>{{ $user->address }}</textarea>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label for="city" class="block text-sm font-medium text-gray-700 mb-1">Kota</label>
+                                        <input type="text" name="city" id="city" value="{{ $user->city }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent">
+                                    </div>
+                                    <div>
+                                        <label for="province" class="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
+                                        <input type="text" name="province" id="province" value="{{ $user->province }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent">
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="postal_code" class="block text-sm font-medium text-gray-700 mb-1">Kode Pos</label>
+                                    <input type="text" name="postal_code" id="postal_code" value="{{ $user->postal_code }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent">
+                                </div>
                             </div>
 
                             <div class="mb-6">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi di Peta <span class="text-red-500">*</span></label>
                                 <div id="map" class="w-full h-64 rounded-lg border border-gray-300 mb-2"></div>
                                 <p class="text-sm text-gray-500">Klik pada peta untuk menentukan lokasi pengiriman yang tepat</p>
-                                <input type="hidden" name="latitude" id="latitude" required>
-                                <input type="hidden" name="longitude" id="longitude" required>
+                                <input type="hidden" name="latitude" id="latitude" value="{{ $user->latitude ?? '' }}" required>
+                                <input type="hidden" name="longitude" id="longitude" value="{{ $user->longitude ?? '' }}" required>
                                 <div id="distance-info" class="mt-2 p-3 bg-blue-50 text-blue-800 rounded-lg hidden">
                                     <p><i class="fas fa-info-circle mr-2"></i> <span id="distance-text"></span></p>
                                 </div>
@@ -197,6 +240,23 @@
         function numberFormat(number) {
             return new Intl.NumberFormat('id-ID').format(number);
         }
+
+        // Toggle default address
+        document.getElementById('use_default_address').addEventListener('change', function() {
+            const manualAddressSection = document.getElementById('manual-address-section');
+
+            if (this.checked) {
+                manualAddressSection.classList.add('hidden');
+
+                // Fill in with default values if available
+                @if($user->latitude && $user->longitude && $user->is_default_address)
+                    setMarker({{ $user->latitude }}, {{ $user->longitude }});
+                    calculateShipping({{ $user->latitude }}, {{ $user->longitude }});
+                @endif
+            } else {
+                manualAddressSection.classList.remove('hidden');
+            }
+        });
 
         function submitCheckout() {
             const form = document.getElementById('checkout-form');

@@ -10,11 +10,11 @@
                     <div class="md:w-1/2 p-8 md:p-12 flex items-center">
                         <div>
                             <h1 class="text-3xl font-bold text-gray-800 mb-4">Tentang Toko Deden</h1>
-                            <p class="text-gray-600 mb-6">
+                            <p class="text-gray-600 mb-6 text-justify">
                                 Toko Deden adalah toko pakan ternak online terpercaya yang berdedikasi menyediakan berbagai jenis pakan ternak berkualitas dengan harga kompetitif. Kami melayani kebutuhan peternak di seluruh wilayah dengan pengiriman cepat dan pelayanan terbaik.
                             </p>
-                            <p class="text-gray-600">
-                                Didirikan pada tahun 2015, Toko Deden telah menjadi mitra terpercaya bagi banyak peternak untuk memenuhi kebutuhan pakan ternak mereka. Kami berkomitmen untuk selalu menyediakan produk berkualitas tinggi dan pelayanan yang memuaskan untuk semua pelanggan kami.
+                            <p class="text-gray-600 text-justify">
+                                Didirikan pada tahun 2020, Toko Deden telah menjadi mitra terpercaya bagi banyak peternak untuk memenuhi kebutuhan pakan ternak mereka. Kami berkomitmen untuk selalu menyediakan produk berkualitas tinggi dan pelayanan yang memuaskan untuk semua pelanggan kami.
                             </p>
                         </div>
                     </div>
