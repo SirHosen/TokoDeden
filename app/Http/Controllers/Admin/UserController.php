@@ -150,7 +150,20 @@ class UserController extends Controller
         ]);
 
         $data = $request->except('avatar', 'password');
-        $data['is_active'] = $request->boolean('is_active');
+
+        // Debug log to see what data we're receiving
+        \Log::debug('Admin user update data:', [
+            'address' => $request->address,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'is_default_address' => $request->has('is_default_address'),
+            'is_active' => $request->has('is_active'),
+            'request_all' => $request->all(),
+        ]);
+
+        // Handle boolean fields explicitly
+        $data['is_active'] = $request->has('is_active');
+        $data['is_default_address'] = $request->has('is_default_address');
 
         // Update password only if it's provided
         if ($request->filled('password')) {

@@ -13,11 +13,8 @@ class ProfileController extends Controller
 {
     public function edit(Request $request): View
     {
-        // Always get fresh user data from database
-        $user = $request->user()->fresh();
-
         return view('profile.edit', [
-            'user' => $user,
+            'user' => $request->user(),
         ]);
     }
 
@@ -77,14 +74,12 @@ class ProfileController extends Controller
                 'province' => 'nullable|string|max:100',
                 'postal_code' => 'nullable|string|max:20',
                 'address_name' => 'nullable|string|max:50',
+                'is_default_address' => 'nullable|boolean',
                 'latitude' => 'nullable|numeric',
                 'longitude' => 'nullable|numeric',
             ]);
 
             $user = $request->user();
-
-            // Handle boolean field explicitly - checkbox behavior
-            $isDefaultAddress = $request->is_default_address == '1';
 
             // Debug log to see what data we're receiving
             \Log::debug('Profile update address data:', [
@@ -92,10 +87,12 @@ class ProfileController extends Controller
                 'address' => $request->address,
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
-                'is_default_address_raw' => $request->is_default_address,
-                'is_default_address_processed' => $isDefaultAddress,
+                'is_default_address' => $request->has('is_default_address'),
                 'all_data' => $request->all(),
             ]);
+
+            // Handle boolean field explicitly
+            $isDefaultAddress = $request->has('is_default_address');
 
             $updateData = [
                 'address' => $request->address,
@@ -111,18 +108,13 @@ class ProfileController extends Controller
 
             $user->update($updateData);
 
-            // Refresh user data to ensure updated values are shown
-            $user->refresh();
+            \Log::debug('Address updated successfully for user: ' . $user->id);
 
-            \Log::debug('Address updated successfully for user: ' . $user->id, [
-                'updated_data' => $user->only(['address', 'phone', 'city', 'province', 'postal_code', 'latitude', 'longitude', 'is_default_address'])
-            ]);
-
-            return Redirect::route('profile.edit', ['tab' => 'address'])->with('status', 'address-updated');
+            return Redirect::route('profile.edit')->with('status', 'address-updated');
 
         } catch (\Exception $e) {
             \Log::error('Error updating address: ' . $e->getMessage());
-            return Redirect::route('profile.edit', ['tab' => 'address'])->with('error', 'Gagal menyimpan alamat: ' . $e->getMessage());
+            return Redirect::route('profile.edit')->with('error', 'Gagal menyimpan alamat: ' . $e->getMessage());
         }
     }
 }

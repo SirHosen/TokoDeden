@@ -62,8 +62,7 @@
         </div>
 
         <div class="flex items-center">
-            <input type="hidden" name="is_default_address" value="0">
-            <input type="checkbox" name="is_default_address" id="is_default_address" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" {{ old('is_default_address', $user->is_default_address) ? 'checked' : '' }}>
+            <input type="checkbox" name="is_default_address" id="is_default_address" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" {{ old('is_default_address', $user->is_default_address) ? 'checked' : '' }}>
             <label for="is_default_address" class="ml-2 text-sm text-gray-600">{{ __('Jadikan alamat default untuk checkout') }}</label>
         </div>
 
@@ -95,32 +94,6 @@
                 <p class="text-sm text-green-600">
                     {{ __('Tersimpan.') }}
                 </p>
-                <script>
-                    // Auto-refresh the form values after successful update
-                    setTimeout(function() {
-                        if (typeof map !== 'undefined' && map) {
-                            const lat = {{ $user->latitude ?? -6.2088 }};
-                            const lng = {{ $user->longitude ?? 106.8456 }};
-
-                            // Update map position
-                            map.setView([lat, lng], 15);
-                            if (typeof marker !== 'undefined' && marker) {
-                                marker.setLatLng([lat, lng]);
-                            }
-
-                            // Update form fields
-                            document.getElementById('latitude').value = lat;
-                            document.getElementById('longitude').value = lng;
-                            document.getElementById('address').value = '{{ $user->address ?? '' }}';
-                            document.getElementById('phone').value = '{{ $user->phone ?? '' }}';
-                            document.getElementById('city').value = '{{ $user->city ?? '' }}';
-                            document.getElementById('province').value = '{{ $user->province ?? '' }}';
-                            document.getElementById('postal_code').value = '{{ $user->postal_code ?? '' }}';
-                            document.getElementById('address_name').value = '{{ $user->address_name ?? '' }}';
-                            document.getElementById('is_default_address').checked = {{ $user->is_default_address ? 'true' : 'false' }};
-                        }
-                    }, 100);
-                </script>
             @endif
         </div>
     </form>

@@ -58,13 +58,34 @@
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <form action="{{ route('cart.update', $item->id) }}" method="POST">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <div class="border border-gray-300 rounded-lg w-24">
-                                                        <input type="number" name="quantity" id="quantity-{{ $item->id }}" min="1" max="{{ $item->product->stock }}" value="{{ $item->quantity }}" class="w-full text-center py-1 border-none focus:ring-0" onchange="this.form.submit()">
-                                                    </div>
-                                                </form>
+                                                <div class="flex items-center space-x-1">
+                                                    <!-- Tombol Minus -->
+                                                    <form action="{{ route('cart.update', $item->id) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="quantity" value="{{ max(1, $item->quantity - 1) }}">
+                                                        <button type="submit" class="w-8 h-8 rounded border border-gray-300 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors text-sm font-medium" {{ $item->quantity <= 1 ? 'disabled' : '' }}>
+                                                            -
+                                                        </button>
+                                                    </form>
+
+                                                    <!-- Input Jumlah -->
+                                                    <form action="{{ route('cart.update', $item->id) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="number" name="quantity" id="quantity-{{ $item->id }}" min="1" max="{{ $item->product->stock }}" value="{{ $item->quantity }}" class="w-16 text-center py-1 px-1 border border-gray-300 rounded focus:ring-1 focus:ring-green-500 focus:border-green-500" style="-webkit-appearance: none; -moz-appearance: textfield;" onchange="this.form.submit()">
+                                                    </form>
+
+                                                    <!-- Tombol Plus -->
+                                                    <form action="{{ route('cart.update', $item->id) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="quantity" value="{{ min($item->product->stock, $item->quantity + 1) }}">
+                                                        <button type="submit" class="w-8 h-8 rounded border border-gray-300 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors text-sm font-medium" {{ $item->quantity >= $item->product->stock ? 'disabled' : '' }}>
+                                                            +
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-gray-900">
@@ -125,4 +146,16 @@
     </div>
 
 
+    <style>
+        /* Hide number input spinners */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
 </x-app-layout>

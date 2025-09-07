@@ -30,8 +30,10 @@ class ProfileUpdateRequest extends FormRequest
             'city' => ['nullable', 'string', 'max:100'],
             'province' => ['nullable', 'string', 'max:100'],
             'postal_code' => ['nullable', 'string', 'max:20'],
-            'is_default_address' => ['nullable', 'boolean'],
+            'address_name' => ['nullable', 'string', 'max:50'],
             'phone' => ['nullable', 'string', 'max:20'],
+            'latitude' => ['nullable', 'numeric'],
+            'longitude' => ['nullable', 'numeric'],
         ];
     }
 }

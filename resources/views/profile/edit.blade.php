@@ -30,7 +30,7 @@
 
             <!-- Tabs -->
             <div class="bg-white border-b border-gray-200 shadow rounded-b-lg mb-6">
-                <div x-data="{ activeTab: 'profile' }">
+                <div x-data="{ activeTab: '{{ request('tab', 'profile') }}' }">
                     <!-- Tab navigation -->
                     <div class="flex border-b border-gray-200">
                         <button

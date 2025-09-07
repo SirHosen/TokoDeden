@@ -3,7 +3,14 @@
 @section('header', 'Edit Pengguna')
 
 @push('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<style>
+    #map-admin {
+        min-height: 300px;
+        width: 100%;
+        z-index: 10;
+    }
+</style>
 @endpush
 
 @section('content')
@@ -133,8 +140,16 @@
                         <label for="map-admin" class="block text-gray-700 font-medium mb-2">Lokasi di Peta</label>
                         <div id="map-admin" class="w-full h-64 rounded-lg border border-gray-300 mb-2"></div>
                         <p class="mt-1 text-xs text-gray-500">Klik pada peta untuk menandai lokasi</p>
-                        <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', $user->latitude) }}">
-                        <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $user->longitude) }}">
+                        <div class="grid grid-cols-2 gap-4 mt-2">
+                            <div>
+                                <label for="latitude" class="block text-gray-700 font-medium mb-1">Latitude</label>
+                                <input type="text" name="latitude" id="latitude" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent" value="{{ old('latitude', $user->latitude) }}">
+                            </div>
+                            <div>
+                                <label for="longitude" class="block text-gray-700 font-medium mb-1">Longitude</label>
+                                <input type="text" name="longitude" id="longitude" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent" value="{{ old('longitude', $user->longitude) }}">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mb-5">
@@ -159,39 +174,111 @@
 </div>
 
 @push('scripts')
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
+    // Wait for the document to fully load
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize map
-        let map = L.map('map-admin').setView([{{ $user->latitude ?? -6.2088 }}, {{ $user->longitude ?? 106.8456 }}], 13);
+        console.log('Admin document loaded, initializing map');
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        // Default coordinates (Jakarta or user's saved location)
+        const defaultLat = {{ $user->latitude ?? -6.2088 }};
+        const defaultLng = {{ $user->longitude ?? 106.8456 }};
+        console.log('Admin map using coordinates:', defaultLat, defaultLng);
 
-        // Force a map refresh
-        setTimeout(function() {
-            map.invalidateSize();
-        }, 100);
+        // Set the initial values in the visible fields
+        document.getElementById('latitude').value = defaultLat;
+        document.getElementById('longitude').value = defaultLng;
 
-        // Add marker
-        let marker = L.marker([{{ $user->latitude ?? -6.2088 }}, {{ $user->longitude ?? 106.8456 }}], {
-            draggable: true
-        }).addTo(map);
+        let map, marker;
 
-        // Update hidden inputs when marker is dragged
-        marker.on('dragend', function() {
-            const position = marker.getLatLng();
-            document.getElementById('latitude').value = position.lat;
-            document.getElementById('longitude').value = position.lng;
-        });
+        // Wait a moment before initializing the map to ensure container is ready
+        setTimeout(() => {
+            try {
+                console.log('Creating admin map in map-admin element');
 
-        // Allow clicking on map to move the marker
-        map.on('click', function(e) {
-            marker.setLatLng(e.latlng);
-            document.getElementById('latitude').value = e.latlng.lat;
-            document.getElementById('longitude').value = e.latlng.lng;
-        });
+                // Initialize the map
+                map = L.map('map-admin').setView([defaultLat, defaultLng], 15);
+
+                // Add the tile layer (OpenStreetMap)
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                // Add marker at the default position
+                marker = L.marker([defaultLat, defaultLng], {
+                    draggable: true,
+                    title: "Lokasi Pelanggan"
+                }).addTo(map);
+
+                // Make sure the map is properly sized
+                map.invalidateSize();
+
+                // Event: When marker is dragged
+                marker.on('dragend', function() {
+                    const position = marker.getLatLng();
+                    updateCoordinates(position.lat, position.lng);
+                });
+
+                // Event: When map is clicked
+                map.on('click', function(e) {
+                    marker.setLatLng(e.latlng);
+                    updateCoordinates(e.latlng.lat, e.latlng.lng);
+                });
+
+                console.log('Admin map initialized successfully');
+            } catch (error) {
+                console.error('Error initializing admin map:', error);
+            }
+        }, 300);
+
+        // Update coordinates and get address information
+        function updateCoordinates(lat, lng) {
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+            getAddressFromLatLng(lat, lng);
+        }
+
+        // Get address details from coordinates using Nominatim
+        function getAddressFromLatLng(lat, lng) {
+            console.log('Getting address for admin map:', lat, lng);
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+                headers: {
+                    'Accept-Language': 'id',
+                    'User-Agent': 'TokoDeden Admin Application'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Admin Nominatim response:', data);
+
+                if (data && data.address) {
+                    const addr = data.address;
+
+                    // Build address string
+                    let address = '';
+                    if (addr.road) address += addr.road;
+                    if (addr.house_number) address += ' ' + addr.house_number;
+                    if (address === '' && addr.suburb) address = addr.suburb;
+
+                    // Get other address components
+                    const city = addr.city || addr.town || addr.village || addr.suburb || '';
+                    const province = addr.state || '';
+                    const postal_code = addr.postcode || '';
+
+                    // Update form fields
+                    if (address) document.getElementById('address').value = address;
+                    if (city) document.getElementById('city').value = city;
+                    if (province) document.getElementById('province').value = province;
+                    if (postal_code) document.getElementById('postal_code').value = postal_code;
+
+                    console.log('Admin address fields updated');
+                }
+            })
+            .catch(error => {
+                console.error('Error getting address for admin:', error);
+            });
+        }
     });
 </script>
 @endpush
