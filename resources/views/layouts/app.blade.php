@@ -56,7 +56,7 @@
                     <div>
                         <h3 class="text-xl font-semibold mb-4">Hubungi Kami</h3>
                         <ul class="text-gray-300">
-                            <li class="mb-2"><i class="fas fa-map-marker-alt mr-2"></i> Jl. Peternakan No. 123, Jakarta</li>
+                            <li class="mb-2"><i class="fas fa-map-marker-alt mr-2"></i> Jl. Peternakan No. 123, Bekasi</li>
                             <li class="mb-2"><i class="fas fa-phone mr-2"></i> (021) 1234-5678</li>
                             <li><i class="fas fa-envelope mr-2"></i> info@tokodeden.com</li>
                         </ul>

@@ -168,4 +168,11 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.show', $order)
             ->with('success', 'Pesanan telah dibatalkan.');
     }
+
+    public function receipt(Order $order)
+    {
+        $order->load('orderItems.product', 'user');
+
+        return view('shop.orders.receipt', compact('order'));
+    }
 }

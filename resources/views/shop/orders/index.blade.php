@@ -30,7 +30,7 @@
                                     Status
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Detail
+                                    Aksi
                                 </th>
                             </tr>
                         </thead>
@@ -59,9 +59,14 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="{{ route('orders.show', $order->id) }}" class="text-green-600 hover:text-green-800">
-                                            Lihat Detail
-                                        </a>
+                                        <div class="flex gap-2 justify-end">
+                                            <a href="{{ route('orders.show', $order->id) }}" class="text-green-600 hover:text-green-800 px-2 py-1 text-xs">
+                                                <i class="fas fa-eye mr-1"></i>Detail
+                                            </a>
+                                            <a href="{{ route('orders.receipt', $order->id) }}" target="_blank" class="text-blue-600 hover:text-blue-800 px-2 py-1 text-xs">
+                                                <i class="fas fa-receipt mr-1"></i>Struk
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

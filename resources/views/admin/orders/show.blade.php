@@ -60,6 +60,11 @@
 
         <div class="mt-4">
             <div class="flex flex-wrap gap-2 mb-4">
+                <!-- Tombol Cetak Struk - Selalu tampil -->
+                <a href="{{ route('admin.orders.receipt', $order) }}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg text-sm flex items-center">
+                    <i class="fas fa-receipt mr-2"></i> Cetak Struk
+                </a>
+
                 @if($order->status == 'pending')
                     <form action="{{ route('admin.orders.confirm', $order) }}" method="POST">
                         @csrf

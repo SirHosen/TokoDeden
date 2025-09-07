@@ -86,4 +86,17 @@ class OrderController extends Controller
         return redirect()->route('orders.show', $order)
             ->with('success', 'Pesanan berhasil ditandai sebagai diterima. Terima kasih telah berbelanja!');
     }
+
+    public function receipt(Order $order)
+    {
+        // Ensure order belongs to user
+        if ($order->user_id !== Auth::id()) {
+            return redirect()->route('orders.index')
+                ->with('error', 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
+        $order->load('orderItems.product', 'user');
+
+        return view('shop.orders.receipt', compact('order'));
+    }
 }

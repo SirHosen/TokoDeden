@@ -77,6 +77,11 @@
 
                     <!-- Order Actions -->
                     <div class="mt-4 flex flex-wrap gap-2">
+                        <!-- Tombol Cetak Struk -->
+                        <a href="{{ route('orders.receipt', $order) }}" target="_blank" class="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition inline-flex items-center">
+                            <i class="fas fa-receipt mr-2"></i>Cetak Struk
+                        </a>
+
                         @if($order->canBeCancelled())
                             <form action="{{ route('orders.cancel', $order) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?');">
                                 @csrf
