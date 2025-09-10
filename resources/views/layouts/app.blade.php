@@ -22,15 +22,31 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+
+        /* Sticky Footer Styles */
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            min-height: calc(100vh - 200px); /* Adjust based on header + footer height */
+        }
+
+        footer {
+            margin-top: auto;
+        }
     </style>
     @stack('styles')
 </head>
 <body class="font-sans antialiased bg-gray-50">
-    <div class="min-h-screen">
+    <div class="page-container">
         @include('layouts.navigation')
 
         <!-- Page Content -->
-        <main>
+        <main class="content-wrapper">
             @if (session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mx-auto max-w-7xl my-4" role="alert">
                     <span class="block sm:inline">{{ session('success') }}</span>
@@ -46,7 +62,7 @@
             {{ $slot }}
         </main>
 
-        <footer class="bg-gray-800 text-white py-10 mt-12">
+        <footer class="bg-gray-800 text-white py-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
