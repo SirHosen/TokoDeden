@@ -92,7 +92,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 bg-gray-50 p-5 rounded-lg border border-gray-100">
                     <div>
-                        <label for="store_latitude" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <label for="store_latitude" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                             <i class="fas fa-location-arrow text-gray-500 mr-2"></i> Latitude Toko
                         </label>
                         <input type="text" name="store_latitude" id="store_latitude"
@@ -101,7 +101,7 @@
                     </div>
 
                     <div>
-                        <label for="store_longitude" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <label for="store_longitude" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                             <i class="fas fa-location-arrow text-gray-500 mr-2"></i> Longitude Toko
                         </label>
                         <input type="text" name="store_longitude" id="store_longitude"
