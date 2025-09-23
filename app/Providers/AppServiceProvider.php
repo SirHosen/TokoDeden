@@ -1,37 +1,48 @@
 <?php
+// app/Providers/AppServiceProvider.php
 
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        //
+        // Register services for production
+        if ($this->app->environment('production')) {
+            $this->app->bind('path.public', function() {
+                return base_path('public_html');
+            });
+        }
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        // Use Bootstrap for pagination
-        Paginator::useBootstrap();
+        // Force HTTPS in production
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+            $this->app['request']->server->set('HTTPS', 'on');
+        }
 
-        // Format Currency Blade Directive
-        Blade::directive('currency', function ($expression) {
-            return "<?php echo 'Rp ' . number_format($expression, 0, ',', '.'); ?>";
-        });
+        // Set default string length for MySQL
+        Schema::defaultStringLength(191);
 
-        // Stock Status Blade Directive
-        Blade::directive('stockStatus', function ($expression) {
-            return "<?php echo $expression > 0 ? '<span class=\"text-green-600\">Tersedia</span>' : '<span class=\"text-red-600\">Habis</span>'; ?>";
-        });
+        // Use Bootstrap pagination
+        Paginator::useBootstrapFive();
+
+        // Trust all proxies for shared hosting
+        if (config('app.env') === 'production') {
+            // In Laravel 11, we can just use an integer for all headers (value 1)
+            // or configure this in the TrustProxies middleware directly
+            // For now, let's use the Request::HEADER_X_FORWARDED_ALL replacement
+            $this->app['request']->setTrustedProxies(
+                ['*'],
+                1
+            );
+        }
     }
 }

@@ -49,7 +49,8 @@
 
                     <div class="mb-5">
                         <label for="is_active" class="flex items-center">
-                            <input type="checkbox" name="is_active" id="is_active" class="rounded border-gray-300 text-green-600 focus:ring-green-600" {{ old('is_active', true) ? 'checked' : '' }}>
+                            <input type="hidden" name="is_active" value="0">
+                            <input type="checkbox" name="is_active" id="is_active" value="1" class="rounded border-gray-300 text-green-600 focus:ring-green-600" {{ old('is_active', '1') == '1' ? 'checked' : '' }}>
                             <span class="ml-2 text-gray-700 font-medium">Akun Aktif</span>
                         </label>
                         @error('is_active')
@@ -58,16 +59,22 @@
                     </div>
 
                     <div class="mb-5">
-                        <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
-                        <input type="password" name="password" id="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent" required>
+                        <label for="password" class="block text-gray-700 font-medium mb-2">Password <span class="text-red-500">*</span></label>
+                        <input type="password" name="password" id="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent" required minlength="8" placeholder="Minimal 8 karakter">
+                        <div class="mt-1 text-xs text-gray-500">
+                            <span id="password-length" class="text-gray-400">0 karakter</span>
+                        </div>
                         @error('password')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-5">
-                        <label for="password_confirmation" class="block text-gray-700 font-medium mb-2">Konfirmasi Password</label>
-                        <input type="password" name="password_confirmation" id="password_confirmation" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent" required>
+                        <label for="password_confirmation" class="block text-gray-700 font-medium mb-2">Konfirmasi Password <span class="text-red-500">*</span></label>
+                        <input type="password" name="password_confirmation" id="password_confirmation" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent" required minlength="8" placeholder="Ulangi password">
+                        <div class="mt-1 text-xs text-gray-500">
+                            <span id="password-match" class="text-gray-400">Password belum diisi</span>
+                        </div>
                     </div>
                 </div>
 
@@ -128,4 +135,50 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const passwordConfirmInput = document.getElementById('password_confirmation');
+    const passwordLength = document.getElementById('password-length');
+    const passwordMatch = document.getElementById('password-match');
+
+    // Monitor password length
+    passwordInput.addEventListener('input', function() {
+        const length = this.value.length;
+        passwordLength.textContent = length + ' karakter';
+
+        if (length >= 8) {
+            passwordLength.className = 'text-green-600';
+        } else {
+            passwordLength.className = 'text-red-500';
+        }
+
+        checkPasswordMatch();
+    });
+
+    // Monitor password confirmation
+    passwordConfirmInput.addEventListener('input', function() {
+        checkPasswordMatch();
+    });
+
+    function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const confirmation = passwordConfirmInput.value;
+
+        if (password === '' || confirmation === '') {
+            passwordMatch.textContent = 'Password belum diisi';
+            passwordMatch.className = 'text-gray-400';
+        } else if (password === confirmation) {
+            passwordMatch.textContent = 'Password cocok';
+            passwordMatch.className = 'text-green-600';
+        } else {
+            passwordMatch.textContent = 'Password tidak cocok';
+            passwordMatch.className = 'text-red-500';
+        }
+    }
+});
+</script>
+@endpush
 @endsection

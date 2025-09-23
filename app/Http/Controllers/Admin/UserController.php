@@ -78,16 +78,27 @@ class UserController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'phone' => 'nullable|string|max:15',
             'role_id' => 'required|exists:roles,id',
-            'is_active' => 'boolean',
+            'is_active' => 'required|in:0,1',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'address' => 'nullable|string',
             'city' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
+        ], [
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal harus 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'is_active.required' => 'Status akun harus dipilih.',
+            'is_active.in' => 'Status akun tidak valid.',
+            'email.unique' => 'Email sudah digunakan oleh pengguna lain.',
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
         ]);
 
         $data = $request->except('password', 'password_confirmation', 'avatar');
         $data['password'] = Hash::make($request->password);
+        $data['is_active'] = (bool) $request->is_active; // Convert to boolean
 
         if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar');

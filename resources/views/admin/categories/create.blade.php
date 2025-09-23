@@ -20,7 +20,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="mb-6">
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Kategori <span class="text-red-500">*</span></label>
-                    <input type="text" name="name" id="name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent @error('name') border-red-500 @enderror" value="{{ old('name') }}" required>
+                    <input type="text" name="name" id="name"
+                        class="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent border {{ $errors->has('name') ? 'border-red-500' : 'border-gray-300' }}"
+                        value="{{ old('name') }}" required>
                     @error('name')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror

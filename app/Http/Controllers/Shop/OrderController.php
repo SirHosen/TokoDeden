@@ -20,17 +20,59 @@ class OrderController extends Controller
     }
 
     public function show(Order $order)
-    {
-        // Ensure order belongs to user
-        if ($order->user_id !== Auth::id()) {
-            return redirect()->route('orders.index')
+{
+    try {
+        // Enhanced logging for production debugging
+        \Log::info('Order access attempt', [
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'user_id' => auth()->id(),
+            'order_user_id' => $order->user_id,
+            'session_id' => session()->getId(),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent()
+        ]);
+
+        // Check authentication
+        if (!auth()->check()) {
+            \Log::warning('Unauthenticated order access attempt', [
+                'order_number' => $order->order_number,
+                'ip_address' => request()->ip()
+            ]);
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        // Check authorization
+        if (auth()->id() != $order->user_id) {
+            \Log::warning('Unauthorized order access attempt', [
+                'order_number' => $order->order_number,
+                'attempted_by_user' => auth()->id(),
+                'actual_owner' => $order->user_id,
+                'ip_address' => request()->ip()
+            ]);
+            return redirect()->route('shop.orders.index')
                 ->with('error', 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
-        $order->load('orderItems.product');
+        \Log::info('Order access granted', [
+            'order_number' => $order->order_number,
+            'user_id' => auth()->id()
+        ]);
 
         return view('shop.orders.show', compact('order'));
+
+    } catch (\Exception $e) {
+        \Log::error('Error accessing order', [
+            'order_id' => $order->id ?? 'unknown',
+            'user_id' => auth()->id() ?? 'unauthenticated',
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        return redirect()->route('shop.orders.index')
+            ->with('error', 'Terjadi kesalahan saat mengakses pesanan.');
     }
+}
 
     public function cancel(Order $order)
     {
