@@ -12,20 +12,20 @@ APP_DEBUG=false
 APP_TIMEZONE=Asia/Jakarta
 APP_URL=https://tokodeden.page
 
-# Database (sesuaikan dengan hosting Anda)
+# Database Configuration (PENTING: Ganti dengan kredensial database Anda!)
 DB_CONNECTION=mysql
 DB_HOST=localhost
 DB_PORT=3306
-DB_DATABASE=nama_database_production
-DB_USERNAME=username_database_production
-DB_PASSWORD=password_database_production
+DB_DATABASE=twbkawuu_tokodeden
+DB_USERNAME=twbkawuu_user
+DB_PASSWORD=skripsiferi
 
 # Session Configuration untuk Production
 SESSION_DRIVER=file
 SESSION_LIFETIME=120
 SESSION_ENCRYPT=false
 SESSION_PATH=/
-SESSION_DOMAIN=.tokodeden.page
+SESSION_DOMAIN=tokodeden.page
 SESSION_SECURE_COOKIE=true
 SESSION_HTTP_ONLY=true
 SESSION_SAME_SITE=lax
@@ -58,7 +58,7 @@ php artisan config:cache
 php artisan route:cache
 
 # 5. Cache views
-php artisan view:cache
+php artisan route:cache
 
 # 6. Optimize autoloader
 composer dump-autoload --optimize
@@ -75,8 +75,12 @@ php artisan config:clear
 php artisan route:clear
 php artisan view:clear
 
-# 10. Link storage
+# 10. Link storage (PENTING!)
 php artisan storage:link
+
+# 11. Fix storage permissions
+chmod -R 755 storage/
+chmod -R 755 public/storage/
 ```
 
 ## 3. Permissions yang Diperlukan
@@ -84,8 +88,12 @@ php artisan storage:link
 ```bash
 # Set permissions untuk directory Laravel
 chmod -R 755 /path/to/your/laravel/project
-chmod -R 775 storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache public/storage
 chown -R www-data:www-data /path/to/your/laravel/project
+
+# Khusus untuk shared hosting, pastikan:
+chmod -R 755 public/storage/
+chmod -R 755 storage/app/public/
 ```
 
 ## 4. Troubleshooting "Unauthorized action"
@@ -98,12 +106,44 @@ Masalah ini biasanya disebabkan oleh:
 
 ### Solusi:
 
-1. Pastikan `SESSION_DOMAIN=.tokodeden.page` di file .env
+1. **Pastikan SESSION_DOMAIN TANPA titik di awal**: `SESSION_DOMAIN=tokodeden.page` (BUKAN `.tokodeden.page`)
 2. Pastikan `APP_URL=https://tokodeden.page`
 3. Pastikan `SANCTUM_STATEFUL_DOMAINS=tokodeden.page,www.tokodeden.page`
-4. Clear cache setelah mengubah konfigurasi
+4. Clear cache setelah mengubah konfigurasi:
+   ```bash
+   php artisan config:clear
+   php artisan cache:clear
+   php artisan config:cache
+   ```
 
-## 5. File .htaccess untuk Apache (jika menggunakan Apache)
+## 5. Troubleshooting "403 Forbidden Storage"
+
+Masalah `GET https://tokodeden.page/storage/ 403 (Forbidden)` disebabkan oleh:
+
+1. **Storage link tidak dibuat**: `php artisan storage:link`
+2. **Permission salah**: File/folder tidak dapat diakses web server
+3. **Symlink rusak**: Link simbolik tidak valid
+
+### Solusi:
+
+```bash
+# 1. Buat ulang storage link
+rm -rf public/storage
+php artisan storage:link
+
+# 2. Set permission yang benar
+chmod -R 755 storage/app/public/
+chmod -R 755 public/storage/
+
+# 3. Pastikan ownership correct (di shared hosting mungkin tidak perlu)
+chown -R www-data:www-data storage/
+chown -R www-data:www-data public/storage/
+
+# 4. Test akses manual
+# Buka https://tokodeden.page/storage/test.txt (buat file test jika perlu)
+```
+
+## 6. File .htaccess untuk Apache (jika menggunakan Apache)
 
 ```apache
 <IfModule mod_rewrite.c>
@@ -129,7 +169,7 @@ Masalah ini biasanya disebabkan oleh:
 </IfModule>
 ```
 
-## 6. Cek Status Deployment
+## 7. Cek Status Deployment
 
 Setelah deployment, cek hal-hal berikut:
 
@@ -140,9 +180,28 @@ Setelah deployment, cek hal-hal berikut:
 5. Database connection bekerja
 6. File upload/download berfungsi
 
-## 7. Monitoring dan Logs
+## 8. Debugging CSRF Issues
+
+Untuk debug masalah CSRF "Unauthorized action":
+
+```bash
+# 1. Check session files
+ls -la storage/framework/sessions/
+
+# 2. Check Laravel logs
+tail -f storage/logs/laravel.log
+
+# 3. Test CSRF token di browser console:
+console.log(document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+# 4. Check session data di browser (Developer Tools > Application > Cookies)
+# Pastikan ada cookie dengan nama session (default: laravel_session)
+```
+
+## 9. Monitoring dan Logs
 
 - Check error logs: `tail -f storage/logs/laravel.log`
 - Check web server logs (Apache/Nginx)
 - Monitor disk space untuk session files
 - Monitor database connections
+- Use troubleshoot script: `bash troubleshoot.sh`
