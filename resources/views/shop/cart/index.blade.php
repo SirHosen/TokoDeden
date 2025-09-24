@@ -43,7 +43,13 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
                                                     <div class="flex-shrink-0 h-16 w-16">
-                                                        <img class="h-16 w-16 object-cover rounded" src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}">
+                                                        @if($item->product->image && file_exists(public_path('storage/' . $item->product->image)))
+                                                            <img class="h-16 w-16 object-cover rounded" src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}">
+                                                        @else
+                                                            <div class="h-16 w-16 bg-gray-200 rounded flex items-center justify-center">
+                                                                <i class="fas fa-image text-gray-400 text-xl"></i>
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                     <div class="ml-4">
                                                         <div class="text-sm font-medium text-gray-900">

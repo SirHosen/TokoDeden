@@ -68,9 +68,18 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
+        // Ensure user is authenticated
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+        }
+
         // Ensure cart belongs to user
-        if ($cart->user_id !== Auth::id()) {
-            return redirect()->back()->with('error', 'Unauthorized action');
+        $userOwnsCart = Cart::where('id', $cart->id)
+                           ->where('user_id', Auth::id())
+                           ->exists();
+
+        if (!$userOwnsCart) {
+            return redirect()->back()->with('error', 'Item tidak ditemukan di keranjang Anda');
         }
 
         // Check stock availability
@@ -85,9 +94,18 @@ class CartController extends Controller
 
     public function remove(Cart $cart)
     {
+        // Ensure user is authenticated
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+        }
+
         // Ensure cart belongs to user
-        if ($cart->user_id !== Auth::id()) {
-            return redirect()->back()->with('error', 'Unauthorized action');
+        $userOwnsCart = Cart::where('id', $cart->id)
+                           ->where('user_id', Auth::id())
+                           ->exists();
+
+        if (!$userOwnsCart) {
+            return redirect()->back()->with('error', 'Item tidak ditemukan di keranjang Anda');
         }
 
         $cart->delete();
