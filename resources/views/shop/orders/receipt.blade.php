@@ -50,7 +50,7 @@
         <!-- Header Toko -->
         <div class="text-center mb-6">
             <h1 class="text-xl font-bold text-gray-900 mb-1">TOKO DEDEN</h1>
-            <p class="text-xs text-gray-600">Jl. Contoh No. 123, Jakarta</p>
+            <p class="text-xs text-gray-600">Jl. Margahayu No. 123, Jakarta</p>
             <p class="text-xs text-gray-600">Telp: (021) 1234-5678</p>
             <p class="text-xs text-gray-600">Email: info@tokodeden.com</p>
         </div>
@@ -131,15 +131,17 @@
         <div class="mb-4">
             <div class="flex justify-between text-xs mb-1">
                 <span class="font-medium">Status:</span>
-                <span class="
-                    @if($order->status == 'pending') text-yellow-600
-                    @elseif($order->status == 'processing') text-blue-600
-                    @elseif($order->status == 'shipped') text-purple-600
-                    @elseif($order->status == 'delivered') text-green-600
-                    @elseif($order->status == 'cancelled') text-red-600
-                    @endif
-                    font-medium
-                ">{{ $order->status_name }}</span>
+                @php
+                    $statusColors = [
+                        'pending' => 'text-yellow-600',
+                        'processing' => 'text-blue-600',
+                        'shipped' => 'text-purple-600',
+                        'delivered' => 'text-green-600',
+                        'cancelled' => 'text-red-600'
+                    ];
+                    $statusColor = $statusColors[$order->status] ?? 'text-gray-600';
+                @endphp
+                <span class="{{ $statusColor }} font-medium">{{ $order->status_name }}</span>
             </div>
             <div class="flex justify-between text-xs">
                 <span class="font-medium">Pembayaran:</span>

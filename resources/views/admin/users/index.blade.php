@@ -196,7 +196,7 @@
         </div>
 
         <div class="mt-6">
-            {{ $users->withQueryString()->links() }}
+            {{ $users->withQueryString()->links('components.admin-pagination') }}
         </div>
     </div>
 </div>

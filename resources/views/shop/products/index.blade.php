@@ -182,7 +182,7 @@
 
                     <!-- Pagination -->
                     <div class="mt-12">
-                        {{ $products->appends(request()->except('page'))->links() }}
+                        {{ $products->appends(request()->except('page'))->links('components.shop-pagination') }}
                     </div>
 
                     <!-- Need Help Section -->

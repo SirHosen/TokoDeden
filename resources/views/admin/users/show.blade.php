@@ -139,12 +139,17 @@
                                     <div class="text-sm text-gray-900">Rp {{ number_format($order->total_price, 0, ',', '.') }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                        @if($order->status == 'pending') bg-yellow-100 text-yellow-800
-                                        @elseif($order->status == 'processing') bg-blue-100 text-blue-800
-                                        @elseif($order->status == 'shipped') bg-indigo-100 text-indigo-800
-                                        @elseif($order->status == 'delivered') bg-green-100 text-green-800
-                                        @else bg-red-100 text-red-800 @endif">
+                                    @php
+                                        $statusClasses = [
+                                            'pending' => 'bg-yellow-100 text-yellow-800',
+                                            'processing' => 'bg-blue-100 text-blue-800',
+                                            'shipped' => 'bg-indigo-100 text-indigo-800',
+                                            'delivered' => 'bg-green-100 text-green-800',
+                                            'default' => 'bg-red-100 text-red-800'
+                                        ];
+                                        $statusClass = $statusClasses[$order->status] ?? $statusClasses['default'];
+                                    @endphp
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
                                         {{ ucfirst($order->status) }}
                                     </span>
                                 </td>

@@ -3,7 +3,9 @@
 @section('header', 'Laporan Penjualan Produk')
 
 @section('content')
-<div class="flex justify-between items-start mb-6">
+<div class="flex justify-between items-st        <div class="mt-6">
+            {{ $productSales->withQueryString()->links('components.admin-pagination') }}
+        </div> mb-6">
     <div>
         <h2 class="text-2xl font-bold text-gray-800">Detail Penjualan Semua Produk</h2>
         <p class="text-gray-600 mt-1">Melihat performa semua produk yang terjual</p>
@@ -135,7 +137,7 @@
         </div>
 
         <div class="mt-4">
-            {{ $productSales->withQueryString()->links() }}
+            {{ $productSales->withQueryString()->links('components.admin-pagination') }}
         </div>
     </div>
 </div>

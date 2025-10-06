@@ -142,7 +142,7 @@
         </div>
 
         <div class="mt-6">
-            {{ $products->links() }}
+            {{ $products->links('components.admin-pagination') }}
         </div>
     </div>
 </div>

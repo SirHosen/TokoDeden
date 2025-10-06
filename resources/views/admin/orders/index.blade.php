@@ -100,7 +100,9 @@
     </div>
 
     <div class="px-6 py-4">
-        {{ $orders->appends(request()->except('page'))->links() }}
+            <div class="mt-6">
+        {{ $orders->appends(request()->except('page'))->links('components.admin-pagination') }}
+    </div>
     </div>
 </div>
 @endsection

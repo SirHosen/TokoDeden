@@ -76,7 +76,7 @@
 
                 <!-- Pagination -->
                 <div class="mt-6">
-                    {{ $orders->links() }}
+                    {{ $orders->links('components.shop-pagination') }}
                 </div>
             @endif
         </div>
